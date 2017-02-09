@@ -1,5 +1,7 @@
 # hgc-predictor
 
+Very quick hack
+
 Run hgc-utils.py in Python 3 to see results.
 
 To change source file, open hgc-utils.py and change the line:
