@@ -3,7 +3,7 @@ import random
 
 #Global fields
 SIMULATIONS = 100000       #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'naAdjusted.csv' #source file you are using
+INPUT_FILE = 'data/naAdjusted.csv' #source file you are using
 
 def read_team_file(filename):
     """reads in team file with win probability"""
