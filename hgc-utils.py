@@ -3,7 +3,7 @@ import random
 
 #Global fields
 SIMULATIONS = 100000       #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/naAdjusted.csv' #source file you are using
+INPUT_FILE = 'data/na.csv' #source file you are using
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -150,7 +150,7 @@ def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
                     if k.name == j.name:
                         tied_teams.remove(k);
                         break;
-            head_to_head_tiebreaker(tied_teams, max_teams_allowed);
+            out = out + head_to_head_tiebreaker(tied_teams, max_teams_allowed);
             #TODO - recall head to head with teams in out removed. **needed bug fix**
             #if no more spots left, break, this prevents side effects
             if max_teams_allowed == 0:
