@@ -15,6 +15,6 @@ Additionally, column 4 and 5 should have the number of map wins from each set. L
 simulate randomly.
 
 
-TO-DO
-Setup user commandline arguments
-Setup "Crucible mode" where instead of top 3, we are looking for bottom 2 (or at least top 6, anyways)
+TO-DO  
+Setup user commandline arguments  
+Setup "Crucible mode" where instead of top 3, we are looking for bottom 2 (or at least top 6, anyways)  
