@@ -2,8 +2,9 @@ from team import Team
 import random
 
 #Global fields
-SIMULATIONS = 100000       #Number of simulations - 10^5 minimum recommended
+SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/na.csv' #source file you are using
+PRINT_OUTCOMES = False;
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -150,17 +151,15 @@ def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
                     if k.name == j.name:
                         tied_teams.remove(k);
                         break;
-            out = out + head_to_head_tiebreaker(tied_teams, max_teams_allowed);
             #TODO - recall head to head with teams in out removed. **needed bug fix**
             #if no more spots left, break, this prevents side effects
             if max_teams_allowed == 0:
                 return out;
+            return out + head_to_head_tiebreaker(tied_teams, max_teams_allowed);
         #If further tiebreaking is needed
         elif len(i) > 0 and len(i) > max_teams_allowed:
             further = get_further_tiebreaker(i,max_teams_allowed)
-            for i in further:
-                out.append(i);
-            return out;
+            return out + further;
     
 def get_further_tiebreaker(teams_list,max_teams_allowed):
     #sort by win_margin_count in reverse order
@@ -185,12 +184,16 @@ def main():
         prediction = get_prediction(team_file_list)
         ##Top 3 - need to make general
         results.append(get_top_three(prediction))
+        if len(results[i]) == 4:
+            print(results[i]);
     sudden_death_count = 0;
     d = {}
     #Add teams to dictionary
     for i in prediction:#add teams to dictionary
         d[i] = 0        
     for i in results:
+        if PRINT_OUTCOMES:
+            print(i)
         if len(i) < 3: #assumes top 3. Need to make general
             sudden_death_count += 1
         for j in i: #count number of times each team in D appears in top results

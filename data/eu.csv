@@ -16,8 +16,8 @@ SN,MF,0,0,3
 DG,TX,1,3,1
 FN,TX,1,3,2
 TR,SN,1,3,1
-DG,PD,0.5,,
-MF,BG,0.5,,
+DG,PD,1,3,1
+MF,BG,1,3,0
 BG,TR,0.5,,
 TX,MF,0.5,,
 DG,FN,0.5,,
