@@ -137,7 +137,7 @@ def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
     #append each team to the number of wins they have
     for i in tied_wins:
         teams_by_wins[tied_wins[i]].append(i)
-
+    teams_by_wins.reverse()
     #output list
     out = []
     for i in teams_by_wins:
