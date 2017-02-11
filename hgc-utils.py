@@ -2,9 +2,9 @@ from team import Team
 import random
 
 #Global fields
-SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
+SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/na.csv' #source file you are using
-PRINT_OUTCOMES = False;
+PRINT_OUTCOMES = False; #Debugging - trust me, leave this false. 
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -184,8 +184,8 @@ def main():
         prediction = get_prediction(team_file_list)
         ##Top 3 - need to make general
         results.append(get_top_three(prediction))
-        if len(results[i]) == 4:
-            print(results[i]);
+        #if len(results[i]) == 2:
+            #print(results[i]);
     sudden_death_count = 0;
     d = {}
     #Add teams to dictionary
