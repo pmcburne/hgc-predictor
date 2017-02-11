@@ -3,7 +3,7 @@ import random
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/naAdjusted.csv' #source file you are using
+INPUT_FILE = 'data/euAdjusted.csv' #source file you are using
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 3;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
