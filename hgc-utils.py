@@ -3,10 +3,10 @@ import random
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/euAdjusted.csv' #source file you are using
+INPUT_FILE = 'data/na.csv' #source file you are using
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 3;
-REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
+GET_TOP_N = 6;
+REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -130,12 +130,11 @@ def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
     for i in tied_teams:
         tied_wins[i] = 0
         for j in tied_teams:
-            if j in i.beat:
-                tied_wins[i] += 1
+            tied_wins[i] += i.beat.count(j)
     teams_by_wins = []
 
     #create list for each # of wins possible that is empty
-    for i in range(0,len(tied_teams)):
+    for i in range(0,15):#max 14 wins per phase
         teams_by_wins.append([]);
 
     #append each team to the number of wins they have

@@ -3,18 +3,18 @@ class Team:
         self.name = name;
         self.wins = 0
         self.losses = 0
-        self.beat=set()
-        self.lost=set()
+        self.beat=[]
+        self.lost=[]
         self.win_margin_count = [0,0,0]
 
     def add_win(self, team_they_beat,opp_wins):
         self.wins += 1
         self.win_margin_count[opp_wins] += 1
-        self.beat.add(team_they_beat)
+        self.beat.append(team_they_beat)
 
     def add_loss(self, team_they_lost_to):
         self.losses += 1
-        self.lost.add(team_they_lost_to)
+        self.lost.append(team_they_lost_to)
 
     def get_win_percentage(self):
         return wins / (wins + losses)
