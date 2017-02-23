@@ -4,14 +4,25 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 1;
-REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
-CALCULATE_ELO = True;
+GET_TOP_N = 6;
+REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
+CALCULATE_ELO = False;
 JUST_GET_ELO = False;
-ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF','MF','FN','DG','PD','TR','TX','SN','BG'];
+ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
+             'MF','FN','DG','PD','TR','TX','SN','BG',
+             'MB','L5','TP','MI','MM','GG','TB','RV',
+             'ES','SP','ZP'];
+
+ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Naventic',
+                  'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
+                  'MF':'Misfits','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Decks',
+                  'TR':'Tricked eSports','TX':'Team Expert','SN':'Synergy','BG':'beGenius',
+                  'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
+                  'MM':'MVP Miracle','GG':'GG','TB':'Team Blossom','RV':'Raven',
+                  'ES':'E-star','SP':'SuperPerfectTeam','ZP':'Zero Panda'};
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -42,7 +53,7 @@ def get_current_state(team_filename): #pretty sure this is depricated
     #This for loop assumes every team will appear once in the first
     #four games. If that changes, this must be changed
     team_file = read_team_file(team_filename)
-    for i in team_file[:4]:
+    for i in team_file[:10]:
         team_names.add(i['team1'])
         team_names.add(i['team2'])
     for i in team_names:
@@ -108,12 +119,21 @@ def get_prediction(team_file, elo_scores):
         elif i['win%'] == 0:
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
             teams[i['team1']].add_loss(teams[i['team2']])
-        elif elo_odds(teams[i['team1']],teams[i['team2']]) > random.random():#randomly assigning opponent wins 0-2
-            teams[i['team1']].add_win(teams[i['team2']],random.randint(0,2)) #not ideal. Look for long term better solution
-            teams[i['team2']].add_loss(teams[i['team1']])
-        else:
-            teams[i['team2']].add_win(teams[i['team1']],random.randint(0,2)) #not ideal. Look for long term better solution
-            teams[i['team1']].add_loss(teams[i['team2']])
+        else: #Simulate
+            team1_wins = 0
+            team2_wins = 0
+            odds = elo_odds(teams[i['team1']],teams[i['team2']])
+            while team1_wins < 3 and team2_wins < 3:
+                if odds > random.random():
+                    team1_wins += 1
+                else:
+                    team2_wins += 1
+            if team1_wins == 3:
+                teams[i['team1']].add_win(teams[i['team2']],team2_wins) #not ideal. Look for long term better solution
+                teams[i['team2']].add_loss(teams[i['team1']])
+            else:
+                teams[i['team2']].add_win(teams[i['team1']],team1_wins) #not ideal. Look for long term better solution
+                teams[i['team1']].add_loss(teams[i['team2']])
             
     return teams;
 
@@ -224,7 +244,7 @@ def get_team_dictionary(team_file_list, elo_scores):
     team_names = set()
     teams={}
     #Set up Team set
-    for i in team_file_list[:4]:#assumes all 8 teams appear in first 4 games. This number can be increased
+    for i in team_file_list[:6]:#assumes all 8 teams appear in first 4 games. This number can be increased
                            #to accomodate more games without negative side effects
         team_names.add(i['team1'])
         team_names.add(i['team2'])
@@ -234,20 +254,41 @@ def get_team_dictionary(team_file_list, elo_scores):
         teams[i].elo = elo_scores[i]
     return teams;
 
+def get_binomial_win_percentage_three_wins(p):
+    out = 0.0
+    out += p * p * p #3-0
+    out += 3 * p * p * p * (1-p) #3-1 - 3 possibilities - HTTT, THTT, TTHT, not TTTH,
+    #3-2 possibilities - HHTTT, HTHTT, HTTHT,
+    #3-2 possibilities - THHTT, THTHT, TTHHT
+    out += 6 * p * p * p * (1-p) * (1-p)
+    return out
+    
+
+def get_week(*team_names):
+    elo_scores = get_team_elo(GAMES_FILE)
+    for i in range (0, int(len(team_names)/2)):
+        per_game = elo.get_expected(elo_scores[team_names[2*i]],
+                                           elo_scores[team_names[2*i+1]])
+        print(ALL_TEAMS_DICT[team_names[2*i]],':',
+              round(100*get_binomial_win_percentage_three_wins(per_game),2),'%')
+
+def this_week():
+    get_week('L5', 'MB', 'RV', 'TP', 'MM', 'GG', 'MI', 'TB')
+
 def main():
     team_file_list = read_team_file(INPUT_FILE)
     elo_scores = {}
     if CALCULATE_ELO:
         elo_scores = get_team_elo(GAMES_FILE)
     else:
-        elo_scores = get_elo_dictionary()
+        elo_scores = get_elo_team_dictionary()
     if JUST_GET_ELO:
         teams_and_elos = []
         for i in elo_scores:
             teams_and_elos.append([i,round(elo_scores[i].elo)])
         teams_and_elos = sorted(teams_and_elos, key=lambda x: x[1], reverse=True);
         for i in teams_and_elos:
-            print(i[0],'-',i[1])
+            print(ALL_TEAMS_DICT[i[0]],'|',i[1])
         return
     results = []
     for i in range(0,SIMULATIONS):
@@ -282,7 +323,7 @@ def main():
     dlist = sorted(dlist, key=lambda x: x[1], reverse=True);#sort descending by percentage
     rank = 1;
     for i in dlist:
-        print(rank, '|', i[0], '|', i[1],'%')
+        print(rank, '|', ALL_TEAMS_DICT[i[0]], '|', i[1],'%')
         rank += 1
     
 
