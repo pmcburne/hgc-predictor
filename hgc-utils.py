@@ -15,7 +15,7 @@ JUST_GET_ELO = True;
 ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
              'MF','FN','DG','PD','TR','TX','SN','BG',
              'MB','L5','TP','MI','MM','GG','TB','RV',
-             'ES','SP','ZP'];
+             'ES','SP','ZP','XT','CE','SO'];
 
 ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
                   'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
@@ -23,7 +23,8 @@ ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV
                   'TR':'Tricked eSports','TX':'Team Expert','SN':'Synergy','BG':'beGenius',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
                   'MM':'MVP Miracle','GG':'GG','TB':'Team Blossom','RV':'Raven',
-                  'ES':'E-star','SP':'SuperPerfectTeam','ZP':'Zero Panda'};
+                  'ES':'E-star','SP':'SuperPerfectTeam','ZP':'Zero Panda', 'XT':'X-Team',
+                  'CE':'ce', 'SO': 'Start Over Again'};
 
 def read_team_file(filename):
     """reads in team file with win probability"""
