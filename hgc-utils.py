@@ -17,7 +17,6 @@ ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
              'MB','L5','TP','MI','MM','GG','TB','RV',
              'ES','SP','ZP'];
 
-<<<<<<< HEAD
 ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
                   'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
                   'MF':'Misfits','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
