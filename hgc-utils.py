@@ -1,12 +1,17 @@
 from team import Team
 import random
+import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/na.csv' #source file you are using
+INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
+GAMES_FILE = 'data/games.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 6;
-REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
+GET_TOP_N = 1;
+REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
+CALCULATE_ELO = True;
+JUST_GET_ELO = False;
+ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF','MF','FN','DG','PD','TR','TX','SN','BG'];
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -31,7 +36,7 @@ def read_team_file(filename):
         out.append(toAdd)
     return out;
 
-def get_current_state(team_filename):
+def get_current_state(team_filename): #pretty sure this is depricated
     team_names = set()
     teams={}
     #This for loop assumes every team will appear once in the first
@@ -52,20 +57,58 @@ def get_current_state(team_filename):
             
     return teams;
 
-def get_prediction(team_file):
+def get_elo_team_dictionary():
+    d = {}
+    for i in ALL_TEAMS:
+        d[i] = Team(i)
+    return d
+
+def get_team_elo(games_filename):
+    games_file = open(games_filename, 'r')
+    team_dictionary = get_elo_team_dictionary()
+    for line in games_file:
+        if len(line) == 0 or line.startswith('#'):#skip commented lines
+            continue
+        ls = line.split(',');
+        #parse line
+        this_team = ls[0]
+        that_team = ls[1]
+        winner = ls[2]
+        match_type = ls[3]
+        if winner == this_team:
+            this_win = True;
+        elif winner == that_team:
+            this_win = False;
+        else:
+            raise ValueError("winner doesn't match either input team: " + ls)
+        try:
+            this_team = team_dictionary[this_team]
+            that_team = team_dictionary[that_team]
+            elo.process_game(this_team, that_team, this_win, match_type);
+        except KeyError:
+            print(this_team, 'not found');
+            pass;
+    games_file.close()
+    #for i in team_dictionary:
+     #   print(i, team_dictionary[i].elo);
+    return team_dictionary
+
+def elo_odds(team1, team2):
+    return elo.get_expected(team1.elo, team2.elo);
+
+def get_prediction(team_file, elo_scores):
+    teams = get_team_dictionary(team_file, elo_scores)
     '''generates a random simulation from a team file, while not changing decided games'''
-    team_names = set()
-    teams={}
-    for i in team_file[:4]:#assumes all 8 teams appear in first 4 games. This number can be increased
-                           #to accomodate more games without negative side effects
-        team_names.add(i['team1'])
-        team_names.add(i['team2'])
-    for i in team_names:#add teams to dictionary keyed by their name
-        teams[i] = Team(i)
     for i in team_file:
         #generate random number. If less then player 1 win percentage, player 1 wins
         #This is why decided games have percentages 0 and 1
-        if i['win%'] > random.random():#randomly assigning opponent wins 0-2
+        if i['win%'] == 1:
+            teams[i['team1']].add_win(teams[i['team2']],i['team2wins'])
+            teams[i['team2']].add_loss(teams[i['team1']])
+        elif i['win%'] == 0:
+            teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
+            teams[i['team1']].add_loss(teams[i['team2']])
+        elif elo_odds(teams[i['team1']],teams[i['team2']]) > random.random():#randomly assigning opponent wins 0-2
             teams[i['team1']].add_win(teams[i['team2']],random.randint(0,2)) #not ideal. Look for long term better solution
             teams[i['team2']].add_loss(teams[i['team1']])
         else:
@@ -177,13 +220,39 @@ def get_further_tiebreaker(teams_list,max_teams_allowed):
     else: #Tie is broken
         return teams_list[:max_teams_allowed];
                           
+def get_team_dictionary(team_file_list, elo_scores):
+    team_names = set()
+    teams={}
+    #Set up Team set
+    for i in team_file_list[:4]:#assumes all 8 teams appear in first 4 games. This number can be increased
+                           #to accomodate more games without negative side effects
+        team_names.add(i['team1'])
+        team_names.add(i['team2'])
+    #translate Team set to team dictionary    
+    for i in team_names:#add teams to dictionary keyed by their name
+        teams[i] = Team(i)
+        teams[i].elo = elo_scores[i]
+    return teams;
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
+    elo_scores = {}
+    if CALCULATE_ELO:
+        elo_scores = get_team_elo(GAMES_FILE)
+    else:
+        elo_scores = get_elo_dictionary()
+    if JUST_GET_ELO:
+        teams_and_elos = []
+        for i in elo_scores:
+            teams_and_elos.append([i,round(elo_scores[i].elo)])
+        teams_and_elos = sorted(teams_and_elos, key=lambda x: x[1], reverse=True);
+        for i in teams_and_elos:
+            print(i[0],'-',i[1])
+        return
     results = []
     for i in range(0,SIMULATIONS):
         #run simulation
-        prediction = get_prediction(team_file_list)
+        prediction = get_prediction(team_file_list, elo_scores)
         ##Top 3 - need to make general
         results.append(get_top_n(prediction,GET_TOP_N))
         #if len(results[i]) == 2:

@@ -6,6 +6,7 @@ class Team:
         self.beat=[]
         self.lost=[]
         self.win_margin_count = [0,0,0]
+        self.elo=1500
 
     def add_win(self, team_they_beat,opp_wins):
         self.wins += 1
