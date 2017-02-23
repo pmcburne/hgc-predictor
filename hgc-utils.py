@@ -5,7 +5,7 @@ import elo
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
-GAMES_FILE = 'data/games.csv' #games file that records previous games
+GAMES_FILE = 'data/gamesClashes.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 1;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
@@ -15,7 +15,8 @@ JUST_GET_ELO = True;
 ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
              'MF','FN','DG','PD','TR','TX','SN','BG',
              'MB','L5','TP','MI','MM','GG','TB','RV',
-             'ES','SP','ZP','XT','CE','SO'];
+             'ES','SP','ZP','XT','CE','SO',
+             'OC','TW','LA','SE'];
 
 ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
                   'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
@@ -24,7 +25,8 @@ ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
                   'MM':'MVP Miracle','GG':'GG','TB':'Team Blossom','RV':'Raven',
                   'ES':'E-star','SP':'SuperPerfectTeam','ZP':'Zero Panda', 'XT':'X-Team',
-                  'CE':'ce', 'SO': 'Start Over Again'};
+                  'CE':'ce', 'SO': 'Start Over Again',
+                  'OC':'Ocenia','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -93,7 +95,7 @@ def get_team_elo(games_filename):
         elif winner == that_team:
             this_win = False;
         else:
-            raise ValueError("winner doesn't match either input team: " + ls)
+            raise ValueError("winner doesn't match either input team: " + str(ls))
         try:
             this_team = team_dictionary[this_team]
             that_team = team_dictionary[that_team]
@@ -271,7 +273,8 @@ def get_binomial_win_percentage_three_wins(p,n):
 
 def get_week(*team_names):
     elo_scores = get_team_elo(GAMES_FILE)
-    print('Team 1 | 3-0 | 3-1 | 3-2 | 2-3 | 1-3 | 0-3 | Team 2') 
+    print('Team 1 | 3-0 | 3-1 | 3-2 | 2-3 | 1-3 | 0-3 | Team 2')
+    print('----|---|---|---|---|---|---|----')
     for i in range (0, int(len(team_names)/2)):
         per_game = elo.get_expected(elo_scores[team_names[2*i]],
                                            elo_scores[team_names[2*i+1]])
