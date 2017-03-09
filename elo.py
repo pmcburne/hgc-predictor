@@ -4,9 +4,9 @@ import math
 
 #K values
 QUALIFIER = 20
-REGIONAL = 35   #Region Season game - k = 30
-CLASH = 40      #Western/Eastern Clash = 50
-BRAWL = 50      #International Brawl = 60
+REGIONAL = 30   #Region Season game - k = 3
+CLASH = 45      #Western/Eastern Clash = 50
+BRAWL = 60      #International Brawl = 60
 
 #Initial Team Ranking
 NEW_TEAM_RATING = 1500

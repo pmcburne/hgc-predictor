@@ -4,13 +4,13 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
-GAMES_FILE = 'data/gamesClashes.csv' #games file that records previous games
+INPUT_FILE = 'data/na.csv' #data source for match records - this may be deprecated in the future
+GAMES_FILE = 'data/games.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 1;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = True;
+JUST_GET_ELO = False;
 
 ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
              'MF','FN','DG','PD','TR','TX','SN','BG',
@@ -269,7 +269,30 @@ def get_binomial_win_percentage_three_wins(p,n):
         return 6 * p * p * p * (1-p) * (1-p)
     return None
 
-    
+def get_binomial_win_percentage_two_wins(p,n):
+    if n == 0:
+        return p * p
+    elif n == 1:
+        return 2 * p * p * (1-p)
+    return None
+
+def get_week_bo3(*team_names):
+    elo_scores = get_team_elo(GAMES_FILE)
+    print('Team 1 | 2-0 | 2-1 | 1-2 | 0-2 | Team 2')
+    print('----|---|---|---|---|---|---|----')
+    for i in range (0, int(len(team_names)/2)):
+        per_game = elo.get_expected(elo_scores[team_names[2*i]],
+                                           elo_scores[team_names[2*i+1]])
+        team1_win = get_binomial_win_percentage_two_wins(per_game,0) + \
+                    get_binomial_win_percentage_two_wins(per_game,1)
+        team2_win = get_binomial_win_percentage_two_wins(1-per_game,0) + \
+                    get_binomial_win_percentage_two_wins(1-per_game,1)
+        print(ALL_TEAMS_DICT[team_names[2*i]],'-',round(100*team1_win,2),'% |' ,
+              round(100*get_binomial_win_percentage_two_wins(per_game,0),2),' | ',
+              round(100*get_binomial_win_percentage_two_wins(per_game,1),2),' | ',
+              round(100*get_binomial_win_percentage_two_wins(1-per_game,1),2),' | ',
+              round(100*get_binomial_win_percentage_two_wins(1-per_game,0),2),' | ',
+              round(100*team2_win,2),'% -',ALL_TEAMS_DICT[team_names[2*i+1]])
 
 def get_week(*team_names):
     elo_scores = get_team_elo(GAMES_FILE)
@@ -295,7 +318,8 @@ def get_week(*team_names):
 
 
 def this_week():
-    get_week('L5', 'MB', 'RV', 'TP', 'MM', 'GG', 'MI', 'TB')
+    get_week('MF','FN','DG','T8')
+    get_week('MF','DG','MF','T8','FN','DG','FN','T8');
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
