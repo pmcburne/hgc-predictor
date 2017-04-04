@@ -4,23 +4,23 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/na.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/cn.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 6;
-REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
+GET_TOP_N = 1;
+REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
 JUST_GET_ELO = False;
 
 ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
-             'MF','FN','DG','PD','TR','TX','SN','BG',
+             'TL','FN','DG','PD','TR','TX','SN','BG',
              'MB','L5','TP','MI','MM','GG','TB','RV',
              'ES','SP','ZP','XT','CE','SO','HL','RP','KS',
              'OC','TW','LA','SE'];
 
 ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
                   'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
-                  'MF':'Misfits','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
+                  'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
                   'TR':'Tricked eSports','TX':'Team Expert','SN':'Synergy','BG':'beGenius',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
                   'MM':'MVP Miracle','GG':'GG','TB':'Team Blossom','RV':'Raven',
