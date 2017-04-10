@@ -7,10 +7,10 @@ SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/cn.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 1;
-REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
+GET_TOP_N = 6;
+REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = False;
+JUST_GET_ELO = True;
 
 ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
              'TL','FN','DG','PD','TR','TX','SN','BG',
@@ -25,7 +25,7 @@ ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
                   'MM':'MVP Miracle','GG':'GG','TB':'Team Blossom','RV':'Raven',
                   'ES':'E-star','SP':'SuperPerfectTeam','ZP':'Zero Panda--RETIRED', 'XT':'X-Team',
-                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady--NEW','RP':'RPG--NEW','KS':"Kis--NEW",
+                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady--NEW','RP':'RPG--NEW','KS':"Keep It Simple--NEW",
                   'OC':'Ocenia','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
 def read_team_file(filename):
