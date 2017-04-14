@@ -4,8 +4,8 @@ SO,RP,0,0,3
 CE,XT,1,3,0
 KS,XT,0,0,3
 SO,CE,0,0,3
-ES,HL,0.5,,
-SP,RP,0.5,,
+ES,HL,1,3,0
+SP,RP,1,3,0
 HL,XT,0.5,,
 ES,RP,0.5,,
 SP,CE,0.5,,

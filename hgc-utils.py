@@ -4,13 +4,13 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/cn.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/na.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 6;
-REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
+GET_TOP_N = 1;
+REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = True;
+JUST_GET_ELO = False;
 
 ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
              'TL','FN','DG','PD','TR','TX','SN','BG',
@@ -318,7 +318,10 @@ def get_week(*team_names):
 
 
 def this_week():
-    get_week_bo3('L5','SE','ZP','TP','ES','TW','MB','SP')
+    #get_week('GF','T8','NV','BS','TF','SS','NT','TS','NT','NV','T8','TS')
+    #get_week('FN','TX','TL','TR','SN','BG','PD','DG','PD','TL','TX','DG')
+    #get_week('TP','MB','TB','MM','RV','GG','MI','L5','GG','L5','TB','TP');
+    get_week('XT','HL','ES','RP','SP','CE','KS','SO')
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
