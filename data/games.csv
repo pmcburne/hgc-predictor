@@ -700,13 +700,18 @@ ES,HL,ES,R,
 SP,RP,SP,R,
 SP,RP,SP,R,
 SP,RP,SP,R,
+<<<<<<< HEAD
 #HGC Week 6 Day 1,,,,
+=======
+#HGC Week 6,,,,
+>>>>>>> origin/master
 MB,TP,MB,R,
 MB,TP,TP,R,
 MB,TP,MB,R,
 MB,TP,MB,R,
 TB,MM,MM,R,
 TB,MM,MM,R,
+<<<<<<< HEAD
 TB,MM,MM,R,
 TX,FN,TX,R,
 TX,FN,FN,R,
@@ -730,3 +735,6 @@ RV,GG,GG,R,
 MI,L5,L5,R,
 MI,L5,L5,R,
 MI,L5,L5,R,
+=======
+TB,MM,MM,R,
+>>>>>>> origin/master
