@@ -318,10 +318,8 @@ def get_week(*team_names):
 
 
 def this_week():
-    #get_week('GF','T8','NV','BS','TF','SS','NT','TS','NT','NV','T8','TS')
-    #get_week('FN','TX','TL','TR','SN','BG','PD','DG','PD','TL','TX','DG')
-    #get_week('TP','MB','TB','MM','RV','GG','MI','L5','GG','L5','TB','TP');
-    get_week('XT','HL','ES','RP','SP','CE','KS','SO')
+    #get_week('TP','MB','TB','MM','FN','TX','TL','TR','GF','T8','NV','BS')
+    get_week('RV','GG','MI','L5','SN','BG','PD','DG','TF','SS','NT','TS');
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
@@ -335,8 +333,13 @@ def main():
         for i in elo_scores:
             teams_and_elos.append([i,round(elo_scores[i].elo)])
         teams_and_elos = sorted(teams_and_elos, key=lambda x: x[1], reverse=True);
+        rank = 1
         for i in teams_and_elos:
-            print(ALL_TEAMS_DICT[i[0]],'|',i[1])
+            if "RETIRED" in ALL_TEAMS_DICT[i[0]]:
+                pass
+            else:
+                print(rank, '|', ALL_TEAMS_DICT[i[0]],'|',i[1])
+                rank += 1;
         return
     results = []
     for i in range(0,SIMULATIONS):
