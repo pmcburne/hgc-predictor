@@ -6,10 +6,10 @@ KS,XT,0,0,3
 SO,CE,0,0,3
 ES,HL,1,3,0
 SP,RP,1,3,0
-HL,XT,0.5,,
-ES,RP,0.5,,
-SP,CE,0.5,,
-KS,SO,0.5,,
+HL,XT,0,1,3
+ES,RP,1,3,0
+SP,CE,1,3,2
+KS,SO,0,2,3
 RP,CE,0.5,,
 HL,SO,0.5,,
 KS,SP,0.5,,

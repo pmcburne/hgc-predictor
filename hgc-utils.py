@@ -4,7 +4,7 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/cn.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 6;
@@ -318,8 +318,9 @@ def get_week(*team_names):
 
 
 def this_week():
-    #get_week('TP','MB','TB','MM','FN','TX','TL','TR','GF','T8','NV','BS')
-    get_week('RV','GG','MI','L5','SN','BG','PD','DG','TF','SS','NT','TS');
+    get_week("NT","BS","TF","TS","SS","T8","NV","GF","NV","TS","NT","SS");
+    get_week("PD","TR","SN","DG","BG","TX","TL","FN","TL","DG","PD","BG");
+    get_week("RV","L5","TB","MB","MM","TP","GG","MI","RV","TB","GG","MM");
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
@@ -338,7 +339,7 @@ def main():
             if "RETIRED" in ALL_TEAMS_DICT[i[0]]:
                 pass
             else:
-                print(rank, '|', ALL_TEAMS_DICT[i[0]],'|',i[1])
+                print(rank, '\t', ALL_TEAMS_DICT[i[0]],'\t',i[1])
                 rank += 1;
         return
     results = []
@@ -361,12 +362,12 @@ def main():
             sudden_death_count += 1
         for j in i: #count number of times each team in D appears in top results
             d[j] += 1;
-    print("Sudden Death chance", round(100*(sudden_death_count/SIMULATIONS),2),"%")
+    print("Sudden Death chance", round(100*(sudden_death_count/SIMULATIONS),5),"%")
     for i in d: #turn them into percentages rather than raw counts
         #with 1 decimal place '.2%f' is fo suckas
-        d[i] = round((100*d[i]/SIMULATIONS),1);
+        d[i] = round((100*d[i]/SIMULATIONS),5);
         if REVERSE_PERCENTAGES:
-            d[i] = round(100-d[i],1)
+            d[i] = round(100-d[i],5)
     #convert dictionary to list for sexy printing power
     dlist=[]
     for i in d: #add to list the team name and the percentage appearance int
@@ -374,7 +375,7 @@ def main():
     dlist = sorted(dlist, key=lambda x: x[1], reverse=True);#sort descending by percentage
     rank = 1;
     for i in dlist:
-        print(rank, '|', ALL_TEAMS_DICT[i[0]], '|', i[1],'%')
+        print(rank, '\t', ALL_TEAMS_DICT[i[0]], '\t', i[1],'%')
         rank += 1
     
 
