@@ -15,15 +15,17 @@ public class GameFileParser {
 		this.teams = teams;
 	}
 
+	@SuppressWarnings("resource")
 	public List<Match> getMatches() {
 		List<Match> matches = new LinkedList<Match>();
-
+		BufferedReader reader;
 		// read file
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(fileName));
+			reader = new BufferedReader(new FileReader(fileName));
 			String line = reader.readLine();
 			while (line != null) {
 				String[] ls = line.split(",");
+				
 				if (!teams.containsKey(ls[0])) {
 					throw new IllegalStateException("ERROR: Team abbrv " + ls[0] + " not found in teams.");
 				}
@@ -33,8 +35,10 @@ public class GameFileParser {
 				
 				Match t = new Match(teams.get(ls[0]), teams.get(ls[1]));
 				matches.add(t);
+				
 				line = reader.readLine();
 			}
+			reader.close();
 
 		} catch (FileNotFoundException e) {
 			System.err.println("GameFileParser ERROR: File Not Found: Returning Null");
@@ -43,7 +47,6 @@ public class GameFileParser {
 			System.err.println("GameFileParser ERROR: IO Error: Returning Null");
 			return null;
 		}
-
 		return matches;
 	}
 	

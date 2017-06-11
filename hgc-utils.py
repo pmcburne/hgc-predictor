@@ -12,13 +12,13 @@ REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
 JUST_GET_ELO = True;
 
-ALL_TEAMS = ['T8','GF','TS','NV','BS','SS','NT','TF',
+ALL_TEAMS = ['R2','GF','TS','NV','BS','SS','NT','TF',
              'TL','FN','DG','PD','TR','TX','SN','BG',
              'MB','L5','TP','MI','MM','GG','TB','RV',
              'ES','SP','ZP','XT','CE','SO','HL','RP','KS',
              'OC','TW','LA','SE'];
 
-ALL_TEAMS_DICT = {'T8':'Team 8','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
+ALL_TEAMS_DICT = {'R2':'Roll20 eSports','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
                   'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
                   'TR':'Tricked eSports','TX':'Team Expert','SN':'Synergy','BG':'beGenius',

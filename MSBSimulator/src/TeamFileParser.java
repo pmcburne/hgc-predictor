@@ -23,9 +23,14 @@ public class TeamFileParser {
 			while (line != null) {
 				String[] ls = line.split(",");
 				Team t = new Team(ls[0], Integer.parseInt(ls[1]));
+				if (ls.length > 2) {
+					t.points = Integer.parseInt(ls[2]);
+				}
 				teams.put(ls[0], t);
 				line = reader.readLine();
+				
 			}
+			reader.close();
 			
 		} catch (FileNotFoundException e) {
 			System.err.println("TeamFileParser ERROR: File Not Found: Returning Null");

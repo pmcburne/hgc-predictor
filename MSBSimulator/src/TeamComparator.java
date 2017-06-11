@@ -7,8 +7,7 @@ public class TeamComparator implements Comparator<Team>{
 		if (t1.points != t2.points) {
 			return t1.points - t2.points;
 		} else { //sudden death
-			MatchSimulator ms = new SuddenDeathSimulator();
-			if(Math.random() < ms.getHomeWinExpected(t1, t2)) {
+			if(Math.random() < MatchSimulator.getHomeWinExpected(t1, t2)) {
 				return 1;
 			} else {
 				return -1;
