@@ -24,7 +24,15 @@ public class PlayoffFileParser {
 			String line = br.readLine();
 			while(line != null) {
 				String[] ls = line.split(",");
-				Team home = null ; //todo replace
+				//0 game number
+				//1 team 1
+				//2 team 2
+				//3 team 1 wins
+				//4 team 2 wins
+				//5 winner goes to
+				//6 loser goes to
+				
+				line = br.readLine();				
 			}			
 			br.close();
 		} catch (FileNotFoundException e) {
@@ -36,5 +44,10 @@ public class PlayoffFileParser {
 		}
 		
 		return out;
+	}
+	
+	public static void main(String[] args) {
+		PlayoffFileParser pfp = new PlayoffFileParser("data/playoff.csv", "data/teams.csv");
+		pfp.getPlayoffMatches();
 	}
 }
