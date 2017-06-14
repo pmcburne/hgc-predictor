@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +15,8 @@ public class PlayoffFileParser {
 		this.teamFileName = teamFileName;
 	}
 	
-	public List<PlayoffMatch> getPlayoffMatches() {
-		List<PlayoffMatch> out = new ArrayList<PlayoffMatch>();
+	public Playoff getPlayoffMatches() {
+		Map<Integer,PlayoffMatch> playoffMatches = new HashMap<Integer,PlayoffMatch>();
 		TeamFileParser tfp = new TeamFileParser(teamFileName);
 		Map<String,Team> teams = tfp.getTeams();
 		
@@ -23,14 +24,30 @@ public class PlayoffFileParser {
 			BufferedReader br = new BufferedReader(new FileReader(playoffFileName));
 			String line = br.readLine();
 			while(line != null) {
+				Team home, away;
+				boolean bo5 = false;
 				String[] ls = line.split(",");
-				//0 game number
-				//1 team 1
-				//2 team 2
-				//3 team 1 wins
-				//4 team 2 wins
-				//5 winner goes to
-				//6 loser goes to
+				int gameNum = Integer.parseInt(ls[0]);//0 game number
+				if (ls[1].length() < 2) {
+					home = null;
+					away = null;
+				} else {
+					home = teams.get(ls[1]);
+					away = teams.get(ls[2]);
+				}
+				/**
+				int homeWins = Integer.parseInt(ls[3]);
+				int awayWins = Integer.parseInt(ls[4]);
+				*/
+				if (1 == Integer.parseInt(ls[3])) {
+					bo5 = true;
+				}
+				
+				int winnerGoesTo = Integer.parseInt(ls[5]);
+				int loserGoesTo = Integer.parseInt(ls[6]);
+				
+				PlayoffMatch newMatch = new PlayoffMatch(gameNum, home, away, winnerGoesTo, loserGoesTo, bo5);
+				playoffMatches.put(gameNum, newMatch);
 				
 				line = br.readLine();				
 			}			
@@ -43,11 +60,14 @@ public class PlayoffFileParser {
 			return null;
 		}
 		
-		return out;
+		return new Playoff(playoffMatches);
 	}
 	
 	public static void main(String[] args) {
 		PlayoffFileParser pfp = new PlayoffFileParser("data/playoff.csv", "data/teams.csv");
-		pfp.getPlayoffMatches();
+		Playoff po = pfp.getPlayoffMatches();
+		po.printMatches();
+		po.simulateMatches();
+		po.printMatches();
 	}
 }
