@@ -13,7 +13,7 @@ public class PlayoffMatch {
 	
 	public PlayoffMatch(int id, Team home, Team away, 
 			int winnerGoesTo, int loserGoesTo, 
-			boolean bo5){
+			boolean bo5, int homeWins, int awayWins){
 		this.winner = null;
 		this.loser = null;
 		this.id = id;
@@ -22,12 +22,11 @@ public class PlayoffMatch {
 		this.winnerGoesTo = winnerGoesTo;
 		this.loserGoesTo = loserGoesTo;
 		this.bo5 = bo5;
-		this.awayWins = 0;
-		if (bo5){
-			this.homeWins = 0;
+		this.homeWins = homeWins;
+		this.awayWins = awayWins;
+		if (bo5) {
 			this.winsRequired = 3;
 		} else {
-			this.homeWins = 1;
 			this.winsRequired = 4;
 		}
 	}

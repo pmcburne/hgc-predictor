@@ -35,18 +35,18 @@ public class PlayoffFileParser {
 					home = teams.get(ls[1]);
 					away = teams.get(ls[2]);
 				}
-				/**
+				
 				int homeWins = Integer.parseInt(ls[3]);
 				int awayWins = Integer.parseInt(ls[4]);
-				*/
-				if (1 == Integer.parseInt(ls[3])) {
+				
+				if (0 == Integer.parseInt(ls[7])) {
 					bo5 = true;
 				}
 				
 				int winnerGoesTo = Integer.parseInt(ls[5]);
 				int loserGoesTo = Integer.parseInt(ls[6]);
 				
-				PlayoffMatch newMatch = new PlayoffMatch(gameNum, home, away, winnerGoesTo, loserGoesTo, bo5);
+				PlayoffMatch newMatch = new PlayoffMatch(gameNum, home, away, winnerGoesTo, loserGoesTo, bo5, homeWins, awayWins);
 				playoffMatches.put(gameNum, newMatch);
 				
 				line = br.readLine();				
