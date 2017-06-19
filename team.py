@@ -39,6 +39,9 @@ class Team:
         out += '\tWin Margins: ' + str(self.win_margin_count) + '\n'
         return out;
 
+    def get_game_differential():
+        return self.wins - self.losses;
+
     def __str__(self):
         return self.name
 

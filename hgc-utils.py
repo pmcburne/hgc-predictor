@@ -4,27 +4,28 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/na.csv' #data source for match records - this may be deprecated in the future
-GAMES_FILE = 'data/games.csv' #games file that records previous games
+INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
+GAMES_FILE = None #games file that records previous games
+STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 3;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = True;
+JUST_GET_ELO = False;
 
-ALL_TEAMS = ['R2','GF','TS','NV','BS','SS','NT','TF',
-             'TL','FN','DG','PD','TR','TX','SN','BG',
-             'MB','L5','TP','MI','MM','GG','TB','RV',
-             'ES','SP','ZP','XT','CE','SO','HL','RP','KS',
+ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
+             'TL','FN','DG','PD','TR','TX','ZE','GG',
+             'MB','L5','TP','MI','MM','RR','TB','RV',
+             'ES','SP','XT','CE','SO','HL','RP','KS',
              'OC','TW','LA','SE'];
 
 ALL_TEAMS_DICT = {'R2':'Roll20 eSports','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
-                  'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
+                  'ED':'Even in Death-NEW','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
-                  'TR':'Tricked eSports','TX':'Team Expert','SN':'Synergy','BG':'beGenius',
+                  'TR':'Tricked eSports','TX':'Team Expert','GG':'Team Good Guys-NEW','ZE':'Zealots-NEW',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
-                  'MM':'MVP Miracle','GG':'GG','TB':'Team Blossom','RV':'Raven',
-                  'ES':'E-star','SP':'SuperPerfectTeam','ZP':'Zero Panda--RETIRED', 'XT':'X-Team',
+                  'MM':'MVP Miracle','RR':'Rrr-NEW','TB':'Team Blossom','RV':'Raven',
+                  'ES':'E-star','SP':'SuperPerfectTeam', 'XT':'X-Team',
                   'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','KS':"Keep It Simple",
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
@@ -78,32 +79,39 @@ def get_elo_team_dictionary():
         d[i] = Team(i)
     return d
 
-def get_team_elo(games_filename):
-    games_file = open(games_filename, 'r')
+def get_team_elo(starting_elo_file, games_filename):
     team_dictionary = get_elo_team_dictionary()
-    for line in games_file:
-        if len(line) == 0 or line.startswith('#'):#skip commented lines
-            continue
-        ls = line.split(',');
-        #parse line
-        this_team = ls[0]
-        that_team = ls[1]
-        winner = ls[2]
-        match_type = ls[3]
-        if winner == this_team:
-            this_win = True;
-        elif winner == that_team:
-            this_win = False;
-        else:
-            raise ValueError("winner doesn't match either input team: " + str(ls))
-        try:
-            this_team = team_dictionary[this_team]
-            that_team = team_dictionary[that_team]
-            elo.process_game(this_team, that_team, this_win, match_type);
-        except KeyError:
-            print(this_team, 'not found');
-            pass;
-    games_file.close()
+    if starting_elo_file != None:
+        elo_file = open(starting_elo_file, 'r')
+        for line in elo_file:
+            ls = line.split(',');
+            team_dictionary[ls[0]].elo = int(ls[1]);
+        elo_file.close();
+    if games_filename != None:
+        games_file = open(games_filename, 'r')
+        for line in games_file:
+            if len(line) == 0 or line.startswith('#'):#skip commented lines
+                continue
+            ls = line.split(',');
+            #parse line
+            this_team = ls[0]
+            that_team = ls[1]
+            winner = ls[2]
+            match_type = ls[3]
+            if winner == this_team:
+                this_win = True;
+            elif winner == that_team:
+                this_win = False;
+            else:
+                raise ValueError("winner doesn't match either input team: " + str(ls))
+            try:
+                this_team = team_dictionary[this_team]
+                that_team = team_dictionary[that_team]
+                elo.process_game(this_team, that_team, this_win, match_type);
+            except KeyError:
+                print(this_team, 'not found');
+                pass;
+        games_file.close()
     #for i in team_dictionary:
      #   print(i, team_dictionary[i].elo);
     return team_dictionary
@@ -236,10 +244,14 @@ def get_further_tiebreaker(teams_list,max_teams_allowed):
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[2], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[1], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
+    teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
+    teams_list = sorted(teams_list, key=lambda x: x.wins - x.losses, reverse=True)
     ##Sudden Death check
     ##Returns 1 less team as a kludgy as fuck way of signalling this will result in sudden death
     ##Since the two teams are not distinguishable by any tiebreaker metric
-    if teams_list[max_teams_allowed-1].win_margin_count == teams_list[max_teams_allowed].win_margin_count:
+    team1_win_diff = teams_list[max_teams_allowed-1].wins - teams_list[max_teams_allowed-1].losses;
+    team2_win_diff = teams_list[max_teams_allowed].wins - teams_list[max_teams_allowed].losses;
+    if team1_win_diff == team2_win_diff and teams_list[max_teams_allowed-1].win_margin_count == teams_list[max_teams_allowed].win_margin_count:
         return teams_list[:max_teams_allowed-1];
     else: #Tie is broken
         return teams_list[:max_teams_allowed];
@@ -326,7 +338,7 @@ def main():
     team_file_list = read_team_file(INPUT_FILE)
     elo_scores = {}
     if CALCULATE_ELO:
-        elo_scores = get_team_elo(GAMES_FILE)
+        elo_scores = get_team_elo(STARTING_ELO_FILE, GAMES_FILE)
     else:
         elo_scores = get_elo_team_dictionary()
     if JUST_GET_ELO:
