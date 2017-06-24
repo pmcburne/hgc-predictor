@@ -4,8 +4,8 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
-GAMES_FILE = None #games file that records previous games
+INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
+GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 3;
@@ -19,10 +19,10 @@ ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
              'ES','SP','XT','CE','SO','HL','RP','KS',
              'OC','TW','LA','SE'];
 
-ALL_TEAMS_DICT = {'R2':'Roll20 eSports','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
+ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','NV':'Team Naventic',
                   'ED':'Even in Death-NEW','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
-                  'TR':'Tricked eSports','TX':'Team Expert','GG':'Team Good Guys-NEW','ZE':'Zealots-NEW',
+                  'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys-NEW','ZE':'Zealots-NEW',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
                   'MM':'MVP Miracle','RR':'Rrr-NEW','TB':'Team Blossom','RV':'Raven',
                   'ES':'E-star','SP':'SuperPerfectTeam', 'XT':'X-Team',
