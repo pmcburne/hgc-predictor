@@ -16,7 +16,7 @@ JUST_GET_ELO = False;
 ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
              'TL','FN','DG','PD','TR','TX','ZE','GG',
              'MB','L5','TP','MI','MM','RR','TB','RV',
-             'ES','SP','XT','CE','SO','HL','RP','KS',
+             'ES','SP','WK','CE','SO','HL','RP','KT',
              'OC','TW','LA','SE'];
 
 ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','NV':'Team Naventic',
@@ -25,8 +25,8 @@ ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo St
                   'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys-NEW','ZE':'Zealots-NEW',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
                   'MM':'MVP Miracle','RR':'Rrr-NEW','TB':'Team Blossom','RV':'Raven',
-                  'ES':'E-star','SP':'SuperPerfectTeam', 'XT':'X-Team',
-                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','KS':"Keep It Simple",
+                  'ES':'E-star','SP':'SuperPerfectTeam', 'KT':'Kudos Top-NEW',
+                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','WK':"W.K. Gaming-NEW",
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
 def read_team_file(filename):
@@ -113,7 +113,7 @@ def get_team_elo(starting_elo_file, games_filename):
                 pass;
         games_file.close()
     #for i in team_dictionary:
-     #   print(i, team_dictionary[i].elo);
+    #   print(i, team_dictionary[i].elo);
     return team_dictionary
 
 def elo_odds(team1, team2):
@@ -260,7 +260,7 @@ def get_team_dictionary(team_file_list, elo_scores):
     team_names = set()
     teams={}
     #Set up Team set
-    for i in team_file_list[:6]:#assumes all 8 teams appear in first 4 games. This number can be increased
+    for i in team_file_list[:12]:#assumes all 8 teams appear in first 12 games. This number can be increased
                            #to accomodate more games without negative side effects
         team_names.add(i['team1'])
         team_names.add(i['team2'])
@@ -289,7 +289,7 @@ def get_binomial_win_percentage_two_wins(p,n):
     return None
 
 def get_week_bo3(*team_names):
-    elo_scores = get_team_elo(GAMES_FILE)
+    elo_scores = get_team_elo(STARTING_ELO_FILE,GAMES_FILE)
     print('Team 1 | 2-0 | 2-1 | 1-2 | 0-2 | Team 2')
     print('----|---|---|---|---|---|---|----')
     for i in range (0, int(len(team_names)/2)):
@@ -307,7 +307,7 @@ def get_week_bo3(*team_names):
               round(100*team2_win,2),'% -',ALL_TEAMS_DICT[team_names[2*i+1]])
 
 def get_week(*team_names):
-    elo_scores = get_team_elo(GAMES_FILE)
+    elo_scores = get_team_elo(STARTING_ELO_FILE,GAMES_FILE)
     print('Team 1 | 3-0 | 3-1 | 3-2 | 2-3 | 1-3 | 0-3 | Team 2')
     print('----|---|---|---|---|---|---|----')
     for i in range (0, int(len(team_names)/2)):
@@ -330,9 +330,9 @@ def get_week(*team_names):
 
 
 def this_week():
-    get_week("NT","BS","TF","TS","SS","T8","NV","GF","NV","TS","NT","SS");
-    get_week("PD","TR","SN","DG","BG","TX","TL","FN","TL","DG","PD","BG");
-    get_week("RV","L5","TB","MB","MM","TP","GG","MI","RV","TB","GG","MM");
+    get_week("GF","NT","SS","TF","NV","TS","ED","R2","TF","GF","TS","SS");
+    get_week("TL","TR","TX","PD","GG","FN","ZE","DG","PD","TL","FN","TX");
+    get_week("MM","RV","RR","MB","MB","MI","L5","RR","TB","L5","TP","MI");
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
