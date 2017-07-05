@@ -19,8 +19,10 @@ ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
              'ES','SP','WK','CE','SO','HL','RP','KT',
              'OC','TW','LA','SE'];
 
+
 ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','NV':'Team Naventic',
                   'ED':'Even in Death-NEW','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
+
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
                   'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys-NEW','ZE':'Zealots-NEW',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
