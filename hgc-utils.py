@@ -3,7 +3,7 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 1000      #Number of simulations - 10^5 minimum recommended
+SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
@@ -154,39 +154,51 @@ def get_prediction(team_file, elo_scores):
             
     return teams;
 
+def get_top_1(teams_by_wins):
+    teams_by_wins = sorted(teams_by_wins, key=lambda x: x.wins, reverse=True);
+    if (len(teams_by_wins) == 1):
+        return teams_by_wins[0];
+    elif (teams_by_wins[0].wins > teams_by_wins[1].wins):
+        return teams_by_wins[0];
+    else: #get tied teams
+        tied_teams = [];
+        target_wins = teams_by_wins[0].wins
+        for i in teams_by_wins:
+            if i.wins == target_wins:
+                tied_teams.append(i);
+        ans = head_to_head_tiebreaker(tied_teams);
+        if (len(ans) == 1):
+            return ans[0];
+        elif (len(ans) == 0):
+            return None;
+
 def get_top_n(prediction,n): #this function will be renamed to get_top_n and will take in an n arugment.
     #this is so I can focus on crucible in stage 6.
     #n = 0 crashes this. Not going to fix that.
-    '''Prediction is a team dictionary'''
-    teams_by_wins = []
-    out = []
+    teams_by_wins = [];
+    out = [];
     for i in prediction:
         teams_by_wins.append(prediction[i])
-    #get sorted list of teams
-    teams_by_wins = sorted(teams_by_wins, key=lambda x: x.wins, reverse=True);
-    if teams_by_wins[n-1].wins > teams_by_wins[n].wins:
-        lst = teams_by_wins[0:n]
-        for i in lst:
-            out.append(i.name);
-        return out
-    else:#tiebreaker
-        # this approach is incredibly fucking kludgy, and likely should be rewritten
-        # specifically in phase 2, when we are talking about crucible, so top 6 (to isolate bottom 2)
-        # instead of top 3. I should rewrite this using a loop. No clue why I thought writing it this way was
-        # a good idea
-        i = n
-        while (i>0):
-            if teams_by_wins[i-1].wins > teams_by_wins[i].wins:
-                lst = teams_by_wins[0:i]
-                for j in lst:
-                    out.append(j.name);
-                for j in get_tie_breaker_teams(teams_by_wins,i,n):
-                    out.append(j.name);
-                return out;
-            i -= 1
-        for i in get_tie_breaker_teams(teams_by_wins,0,n):
-            out.append(i.name);
-        return out;
+
+    while (n > 0) :
+        next_team_up = get_top_1(teams_by_wins);
+        if (next_team_up == None):
+            return out;
+        out.append(next_team_up);
+        n = n - 1;
+        found = False;
+        toRemove = None;
+        for i in teams_by_wins:
+            if i.name == next_team_up.name:
+                toRemove = i;
+                found = True;
+        if not found:
+            print(next_team_up.name + " not found")
+        else:
+            teams_by_wins.remove(toRemove);
+
+    return out;
+
             
 def get_tie_breaker_teams(teams_by_wins, num_teams_above_tie,max_allowed):
     '''assume team by wins sorted as precondition. Get list of teams in tiebreaker'''
@@ -198,12 +210,13 @@ def get_tie_breaker_teams(teams_by_wins, num_teams_above_tie,max_allowed):
             tied_teams.add(i);
     return head_to_head_tiebreaker(tied_teams, max_allowed - num_teams_above_tie)
 
-def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
+def head_to_head_tiebreaker(tied_teams):
     #print(tied_teams, max_teams_allowed)
     #Take in a list of teams, find how they did against each other, striate them based
     #on this internal head-to-head, and advance those with the best record.
 
     #tied_teams - set of teams in the tie
+    max_teams_allowed = 1;
     tied_losses = {}
 
     #get head-to-head results
@@ -217,7 +230,7 @@ def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
     for i in range(0,15):#max 14 wins per phase
         teams_by_losses.append([]);
 
-    #append each team to the number of wins they have
+    #append each team to the number of losses they have
     for i in tied_losses:
         teams_by_losses[tied_losses[i]].append(i)
 
@@ -225,37 +238,28 @@ def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
         if len(teams_by_losses[0]) == 1:
             return [teams_by_losses[0][0]];
         else:
-            return get_further_tiebreaker(tied_teams,max_teams_allowed);
+            return get_further_tiebreaker(tied_teams);
 
     elif len(tied_teams) == 3:
         if len(teams_by_losses[0]) == 1:
-            if max_teams_allowed == 1:
-                return [teams_by_losses[0][0]];
-            else :
-                #get team list sans that team
-                tied_teams.remove(teams_by_losses[0][0]);
-                return [teams_by_losses[0][0]] + get_further_tiebreaker(tied_teams,max_teams_allowed-1);
-        #elif len(teams_by_losses[1]) == 1:
-        #    if max_teams_allowed == 1:
-        #        return [teams_by_losses[1][0]];
-        #    else :
-        #        #get team list sans that team
-        #        tied_teams.remove(teams_by_losses[1][0]);
-        #        return [teams_by_losses[1][0]] + get_further_tiebreaker(tied_teams,max_teams_allowed-1);
+            return [teams_by_losses[0][0]];
         else :
-            return get_further_tiebreaker(tied_teams,max_teams_allowed);
+            return get_further_tiebreaker(tied_teams);
     else:
         if len(teams_by_losses[0]) == 1:
-            if max_teams_allowed == 1:
-                return [teams_by_losses[0][0]];
-            else :
-                #get team list sans that team
-                tied_teams.remove(teams_by_losses[0][0]);
-                return [teams_by_losses[0][0]] + get_further_tiebreaker(tied_teams,max_teams_allowed-1);
+            return [teams_by_losses[0][0]];
         else :
-            return get_further_tiebreaker(tied_teams,max_teams_allowed);
+            for i in teams_by_losses:
+                if len(i) == 0:
+                    continue;
+                elif len(i) == 1:
+                    return [i[0]];
+                else: #cannot resolve head-to-head
+                    break;
+            return get_further_tiebreaker(tied_teams);
     
-def get_further_tiebreaker(teams_list,max_teams_allowed):
+def get_further_tiebreaker(teams_list):
+    max_teams_allowed = 1;
     #sort by win_margin_count in reverse order
     #This is, in effect, a radix sort
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[2], reverse=True)
@@ -405,7 +409,7 @@ def main():
         if len(i) < GET_TOP_N: #assumes top 3. Need to make general
             sudden_death_count += 1
         for j in i: #count number of times each team in D appears in top results
-            d[j] += 1;
+            d[j.name] += 1;
     print("Sudden Death chance", round(100*(sudden_death_count/SIMULATIONS),5),"%")
     for i in d: #turn them into percentages rather than raw counts
         #with 1 decimal place '.2%f' is fo suckas
