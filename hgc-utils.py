@@ -10,7 +10,7 @@ STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 3;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
-CALCULATE_ELO = True;
+CALCULATE_ELO = False;
 JUST_GET_ELO = False;
 
 ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
@@ -332,9 +332,9 @@ def get_week(*team_names):
 
 
 def this_week():
-    get_week("GF","NT","SS","TF","NV","TS","ED","R2","TF","GF","TS","SS");
-    get_week("TL","TR","TX","PD","GG","FN","ZE","DG","PD","TL","FN","TX");
-    get_week("MM","RV","RR","MB","MB","MI","L5","RR","TB","L5","TP","MI");
+    get_week("NT","NV","R2","TF","TS","R2","ED","GF","ED","NT","SS","NV");
+    get_week("TR","GG","DG","PD","FN","DG","ZE","TL","ZE","TR","TX","GG");
+    get_week("MB","TP","MM","L5","RV","L5","MI","TB","RR","RV","MB","MM");
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
