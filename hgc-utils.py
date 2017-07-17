@@ -3,15 +3,16 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
+SIMULATIONS = 1000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 3;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
-CALCULATE_ELO = False;
+CALCULATE_ELO = True;
 JUST_GET_ELO = False;
+PRINT_SUDDEN_DEATHS = True;
 
 ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
              'TL','FN','DG','PD','TR','TX','ZE','GG',
@@ -30,6 +31,8 @@ ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo St
                   'ES':'E-star','SP':'SuperPerfectTeam', 'KT':'Kudos Top-NEW',
                   'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','WK':"W.K. Gaming-NEW",
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
+
+sudden_deaths = {};
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -68,10 +71,10 @@ def get_current_state(team_filename): #pretty sure this is depricated
     for i in team_file:
         if i['win%'] == 1:
             teams[i['team1']].add_win(teams[i['team2']],i['team2wins'])
-            teams[i['team2']].add_loss(teams[i['team1']])
+            teams[i['team2']].add_loss(teams[i['team1']],i['team2wins'])
         elif i['win%'] == 0:
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
-            teams[i['team1']].add_loss(teams[i['team2']])
+            teams[i['team1']].add_loss(teams[i['team2']],i['team1wins'])
             
     return teams;
 
@@ -129,10 +132,10 @@ def get_prediction(team_file, elo_scores):
         #This is why decided games have percentages 0 and 1
         if i['win%'] == 1:
             teams[i['team1']].add_win(teams[i['team2']],i['team2wins'])
-            teams[i['team2']].add_loss(teams[i['team1']])
+            teams[i['team2']].add_loss(teams[i['team1']],i['team2wins'])
         elif i['win%'] == 0:
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
-            teams[i['team1']].add_loss(teams[i['team2']])
+            teams[i['team1']].add_loss(teams[i['team2']],i['team1wins'])
         else: #Simulate
             team1_wins = 0
             team2_wins = 0
@@ -144,10 +147,10 @@ def get_prediction(team_file, elo_scores):
                     team2_wins += 1
             if team1_wins == 3:
                 teams[i['team1']].add_win(teams[i['team2']],team2_wins) #not ideal. Look for long term better solution
-                teams[i['team2']].add_loss(teams[i['team1']])
+                teams[i['team2']].add_loss(teams[i['team1']],team2_wins)
             else:
                 teams[i['team2']].add_win(teams[i['team1']],team1_wins) #not ideal. Look for long term better solution
-                teams[i['team1']].add_loss(teams[i['team2']])
+                teams[i['team1']].add_loss(teams[i['team2']],team1_wins)
             
     return teams;
 
@@ -201,44 +204,56 @@ def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
     #on this internal head-to-head, and advance those with the best record.
 
     #tied_teams - set of teams in the tie
-    tied_wins = {}
+    tied_losses = {}
 
     #get head-to-head results
     for i in tied_teams:
-        tied_wins[i] = 0
+        tied_losses[i] = 0
         for j in tied_teams:
-            tied_wins[i] += i.beat.count(j)
-    teams_by_wins = []
+            tied_losses[i] += i.lost.count(j)
+    teams_by_losses = []
 
     #create list for each # of wins possible that is empty
     for i in range(0,15):#max 14 wins per phase
-        teams_by_wins.append([]);
+        teams_by_losses.append([]);
 
     #append each team to the number of wins they have
-    for i in tied_wins:
-        teams_by_wins[tied_wins[i]].append(i)
-    teams_by_wins.reverse()
-    #output list
-    out = []
-    for i in teams_by_wins:
-        if len(i) > 0 and len(i) <= max_teams_allowed:
-            max_teams_allowed -= len(i)
-            for j in i:
-                out.append(j)
-                #tied_teams.remove(j) #this apparently doesn't work for....reasons?
-                for k in tied_teams:
-                    if k.name == j.name:
-                        tied_teams.remove(k);
-                        break;
-            #TODO - recall head to head with teams in out removed. **needed bug fix**
-            #if no more spots left, break, this prevents side effects
-            if max_teams_allowed == 0:
-                return out;
-            return out + head_to_head_tiebreaker(tied_teams, max_teams_allowed);
-        #If further tiebreaking is needed
-        elif len(i) > 0 and len(i) > max_teams_allowed:
-            further = get_further_tiebreaker(i,max_teams_allowed)
-            return out + further;
+    for i in tied_losses:
+        teams_by_losses[tied_losses[i]].append(i)
+
+    if len(tied_teams) == 2:
+        if len(teams_by_losses[0]) == 1:
+            return [teams_by_losses[0][0]];
+        else:
+            return get_further_tiebreaker(tied_teams,max_teams_allowed);
+
+    elif len(tied_teams) == 3:
+        if len(teams_by_losses[0]) == 1:
+            if max_teams_allowed == 1:
+                return [teams_by_losses[0][0]];
+            else :
+                #get team list sans that team
+                tied_teams.remove(teams_by_losses[0][0]);
+                return [teams_by_losses[0][0]] + get_further_tiebreaker(tied_teams,max_teams_allowed-1);
+        #elif len(teams_by_losses[1]) == 1:
+        #    if max_teams_allowed == 1:
+        #        return [teams_by_losses[1][0]];
+        #    else :
+        #        #get team list sans that team
+        #        tied_teams.remove(teams_by_losses[1][0]);
+        #        return [teams_by_losses[1][0]] + get_further_tiebreaker(tied_teams,max_teams_allowed-1);
+        else :
+            return get_further_tiebreaker(tied_teams,max_teams_allowed);
+    else:
+        if len(teams_by_losses[0]) == 1:
+            if max_teams_allowed == 1:
+                return [teams_by_losses[0][0]];
+            else :
+                #get team list sans that team
+                tied_teams.remove(teams_by_losses[0][0]);
+                return [teams_by_losses[0][0]] + get_further_tiebreaker(tied_teams,max_teams_allowed-1);
+        else :
+            return get_further_tiebreaker(tied_teams,max_teams_allowed);
     
 def get_further_tiebreaker(teams_list,max_teams_allowed):
     #sort by win_margin_count in reverse order
@@ -247,13 +262,28 @@ def get_further_tiebreaker(teams_list,max_teams_allowed):
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[1], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
-    teams_list = sorted(teams_list, key=lambda x: x.wins - x.losses, reverse=True)
+    teams_list = sorted(teams_list, key=lambda x: x.map_wins - x.map_losses, reverse=True)
     ##Sudden Death check
     ##Returns 1 less team as a kludgy as fuck way of signalling this will result in sudden death
     ##Since the two teams are not distinguishable by any tiebreaker metric
-    team1_win_diff = teams_list[max_teams_allowed-1].wins - teams_list[max_teams_allowed-1].losses;
-    team2_win_diff = teams_list[max_teams_allowed].wins - teams_list[max_teams_allowed].losses;
+    team1_win_diff = teams_list[max_teams_allowed-1].map_wins - teams_list[max_teams_allowed-1].map_losses;
+    team2_win_diff = teams_list[max_teams_allowed].map_wins - teams_list[max_teams_allowed].map_losses;
     if team1_win_diff == team2_win_diff and teams_list[max_teams_allowed-1].win_margin_count == teams_list[max_teams_allowed].win_margin_count:
+        if PRINT_SUDDEN_DEATHS:
+            abbr_set = [];
+            for i in teams_list :
+                if team1_win_diff == i.map_wins - i.map_losses and teams_list[max_teams_allowed-1].win_margin_count == i.win_margin_count:
+                    abbr_set.append(i.name);
+            abbr_set = sorted(abbr_set);
+            abbrString = "";
+            for i in abbr_set:
+                abbrString += i+ ",";
+            if abbrString not in sudden_deaths:
+                print(teams_list);
+                sudden_deaths[abbrString] = 1;
+            else:
+                sudden_deaths[abbrString] += 1;
+                
         return teams_list[:max_teams_allowed-1];
     else: #Tie is broken
         return teams_list[:max_teams_allowed];
@@ -391,6 +421,8 @@ def main():
     for i in dlist:
         print(rank, '\t', ALL_TEAMS_DICT[i[0]], '\t', i[1],'%')
         rank += 1
+    for i in sudden_deaths:
+        print(i + " - " + str(round((sudden_deaths[i])/SIMULATIONS,5)*100) + "%");
     
 
 if __name__=="__main__":
