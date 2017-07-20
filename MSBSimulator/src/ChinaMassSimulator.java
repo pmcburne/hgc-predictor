@@ -45,11 +45,11 @@ public class ChinaMassSimulator {
 	public void printResults() {
 		System.out.println("===== Eastern Clash =====");
 		for (String s : winnersBracketCounts.keySet()) {
-			System.out.printf((s + " - %.1f\n"), winnersBracketCounts.get(s)/1000.0);
+			System.out.printf((s + " - %.3f\n"), winnersBracketCounts.get(s)/1000.0);
 		}
 		System.out.println("\n===== Relegated ==========");
 		for (String s : eliminatedCounts.keySet()) {
-			System.out.printf((s + " - %.1f\n"), eliminatedCounts.get(s)/1000.0);
+			System.out.printf((s + " - %.3f\n"), eliminatedCounts.get(s)/1000.0);
 		}
 	}
 

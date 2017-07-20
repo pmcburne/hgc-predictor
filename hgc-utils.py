@@ -4,14 +4,16 @@ import elo
 
 #Global fields
 SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 3;
+GET_TOP_N = 2;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
 JUST_GET_ELO = False;
+
+
 PRINT_SUDDEN_DEATHS = True;
 
 ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
@@ -33,6 +35,7 @@ ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo St
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
 sudden_deaths = {};
+sudden_death_size = 0;
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -274,9 +277,13 @@ def get_further_tiebreaker(teams_list):
     team2_win_diff = teams_list[max_teams_allowed].map_wins - teams_list[max_teams_allowed].map_losses;
     if team1_win_diff == team2_win_diff and teams_list[max_teams_allowed-1].win_margin_count == teams_list[max_teams_allowed].win_margin_count:
         if PRINT_SUDDEN_DEATHS:
+            sudden_death_size = 0;
+            sd_teams = [];
             abbr_set = [];
             for i in teams_list :
                 if team1_win_diff == i.map_wins - i.map_losses and teams_list[max_teams_allowed-1].win_margin_count == i.win_margin_count:
+                    sudden_death_size += 1;
+                    sd_teams.append(i);
                     abbr_set.append(i.name);
             abbr_set = sorted(abbr_set);
             abbrString = "";
@@ -287,6 +294,8 @@ def get_further_tiebreaker(teams_list):
                 sudden_deaths[abbrString] = 1;
             else:
                 sudden_deaths[abbrString] += 1;
+            return [random.choice(sd_teams)];
+            
                 
         return teams_list[:max_teams_allowed-1];
     else: #Tie is broken
@@ -366,9 +375,9 @@ def get_week(*team_names):
 
 
 def this_week():
-    get_week("NT","NV","R2","TF","TS","R2","ED","GF","ED","NT","SS","NV");
-    get_week("TR","GG","DG","PD","FN","DG","ZE","TL","ZE","TR","TX","GG");
-    get_week("MB","TP","MM","L5","RV","L5","MI","TB","RR","RV","MB","MM");
+    get_week("NT","R2","GF","SS","NV","ED","TF","TS");
+    get_week("TR","DG","TL","TX","GG","ZE","PD","FN");
+    get_week("MI","L5","TP","RR","MB","RV","TB","MM");
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
