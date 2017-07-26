@@ -18,8 +18,8 @@ public class ChinaGroupSimulator {
 	}
 	
 	public void simulate() {
-		MatchSimulator simulator = new FiftyFiftySimulator();
-		//MatchSimulator simulator = new BestOfTwoSimulator();
+		//MatchSimulator simulator = new FiftyFiftySimulator();
+		MatchSimulator simulator = new BestOfTwoSimulator();
 		for (Match m : matches) {
 			simulator.simulateMatch(m.home, m.away);
 		}

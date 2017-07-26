@@ -4,11 +4,11 @@ import elo
 
 #Global fields
 SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/euClash.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 2;
+GET_TOP_N = 3;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
 JUST_GET_ELO = False;
@@ -160,9 +160,9 @@ def get_prediction(team_file, elo_scores):
 def get_top_1(teams_by_wins):
     teams_by_wins = sorted(teams_by_wins, key=lambda x: x.wins, reverse=True);
     if (len(teams_by_wins) == 1):
-        return teams_by_wins[0];
+        return [teams_by_wins[0]];
     elif (teams_by_wins[0].wins > teams_by_wins[1].wins):
-        return teams_by_wins[0];
+        return [teams_by_wins[0]];
     else: #get tied teams
         tied_teams = [];
         target_wins = teams_by_wins[0].wins
@@ -170,10 +170,7 @@ def get_top_1(teams_by_wins):
             if i.wins == target_wins:
                 tied_teams.append(i);
         ans = head_to_head_tiebreaker(tied_teams);
-        if (len(ans) == 1):
-            return ans[0];
-        elif (len(ans) == 0):
-            return None;
+        return ans;
 
 def get_top_n(prediction,n): #this function will be renamed to get_top_n and will take in an n arugment.
     #this is so I can focus on crucible in stage 6.
@@ -187,18 +184,20 @@ def get_top_n(prediction,n): #this function will be renamed to get_top_n and wil
         next_team_up = get_top_1(teams_by_wins);
         if (next_team_up == None):
             return out;
-        out.append(next_team_up);
-        n = n - 1;
-        found = False;
-        toRemove = None;
-        for i in teams_by_wins:
-            if i.name == next_team_up.name:
-                toRemove = i;
-                found = True;
-        if not found:
-            print(next_team_up.name + " not found")
-        else:
-            teams_by_wins.remove(toRemove);
+        random.shuffle(next_team_up);
+        for k in next_team_up:
+            out.append(k);
+            n = n - 1;
+            found = False;
+            toRemove = None;
+            for i in teams_by_wins:
+                if i.name == k.name:
+                    toRemove = i;
+                    found = True;
+            if not found:
+                print(next_team_up.name + " not found")
+            else:
+                teams_by_wins.remove(toRemove);
 
     return out;
 
@@ -294,7 +293,7 @@ def get_further_tiebreaker(teams_list):
                 sudden_deaths[abbrString] = 1;
             else:
                 sudden_deaths[abbrString] += 1;
-            return [random.choice(sd_teams)];
+            return sd_teams;
             
                 
         return teams_list[:max_teams_allowed-1];
