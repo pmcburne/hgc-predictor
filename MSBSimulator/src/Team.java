@@ -1,13 +1,15 @@
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Team {
 	public String abbrv;
 	public int elo;
 	public int points;
-	public Set<Team> teamsBeat;
-	public Set<Team> teamsDrawn;
-	public Set<Team> teamsLostTo;
+	public List<Team> teamsBeat;
+	public List<Team> teamsDrawn;
+	public List<Team> teamsLostTo;
 	
 	public boolean suddenDeathWin = false;
 
@@ -15,9 +17,9 @@ public class Team {
 		this.abbrv = abbrv;
 		this.elo = elo;
 		points = 0;
-		teamsBeat = new HashSet<Team>();
-		teamsDrawn = new HashSet<Team>();
-		teamsLostTo = new HashSet<Team>();
+		teamsBeat = new ArrayList<Team>();
+		teamsDrawn = new ArrayList<Team>();
+		teamsLostTo = new ArrayList<Team>();
 	}
 	
 	@Override
@@ -44,7 +46,7 @@ public class Team {
 		return out;
 	}
 	
-	private String teamSetToString(Set<Team> teams) {
+	private String teamSetToString(List<Team> teams) {
 		if (teams.isEmpty()) {
 			return "None";
 		}

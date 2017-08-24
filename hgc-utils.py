@@ -3,30 +3,39 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/na.csv' #data source for match records - this may be deprecated in the future
+SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
+INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
+STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 3;
-REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
+GET_TOP_N = 6;
+REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = True;
+JUST_GET_ELO = False;
 
-ALL_TEAMS = ['R2','GF','TS','NV','BS','SS','NT','TF',
-             'TL','FN','DG','PD','TR','TX','SN','BG',
-             'MB','L5','TP','MI','MM','GG','TB','RV',
-             'ES','SP','ZP','XT','CE','SO','HL','RP','KS',
+
+PRINT_SUDDEN_DEATHS = True;
+
+ALL_TEAMS = ['R2','GF','TS','LF','ED','SS','SG','TF',
+             'TL','FN','DG','PD','TR','TX','ZE','GG',
+             'MB','L5','TP','MI','MM','RR','TB','RV',
+             'ES','SP','WK','CE','SO','HL','RP','KT','TO','BG',
              'OC','TW','LA','SE'];
 
-ALL_TEAMS_DICT = {'R2':'Roll 20 eSports','GF':'Gale Force eSports','TS':'Tempo Storm','NV':'Team Naventic',
-                  'BS':'B-Step','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
+
+ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','LF':'Lag Force',
+                  'ED':'Even in Death-NEW','SS':'Superstars','SG':'SpaceStation Gaming','TF':'Team Freedom',
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
-                  'TR':'Tricked eSports','TX':'Team Expert','SN':'Synergy','BG':'beGenius',
+                  'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys','ZE':'Zealots',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
-                  'MM':'MVP Miracle','GG':'GG','TB':'Team Blossom','RV':'Raven',
-                  'ES':'E-star','SP':'SuperPerfectTeam','ZP':'Zero Panda--RETIRED', 'XT':'X-Team',
-                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','KS':"Keep It Simple",
+                  'MM':'MVP Miracle','RR':'Rrr','TB':'Team BlossoM','RV':'Raven',
+                  'ES':'E-star-DISBANDED','SP':'Super Perfect Team', 'KT':'Kudos Top',
+                  'TO':"The One - NEW", 'BG':"Beyond the Game - NEW",
+                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','WK':"W.K. Gaming-RELEGATED",
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
+
+sudden_deaths = {};
+sudden_death_size = 0;
 
 def read_team_file(filename):
     """reads in team file with win probability"""
@@ -65,10 +74,10 @@ def get_current_state(team_filename): #pretty sure this is depricated
     for i in team_file:
         if i['win%'] == 1:
             teams[i['team1']].add_win(teams[i['team2']],i['team2wins'])
-            teams[i['team2']].add_loss(teams[i['team1']])
+            teams[i['team2']].add_loss(teams[i['team1']],i['team2wins'])
         elif i['win%'] == 0:
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
-            teams[i['team1']].add_loss(teams[i['team2']])
+            teams[i['team1']].add_loss(teams[i['team2']],i['team1wins'])
             
     return teams;
 
@@ -78,34 +87,41 @@ def get_elo_team_dictionary():
         d[i] = Team(i)
     return d
 
-def get_team_elo(games_filename):
-    games_file = open(games_filename, 'r')
+def get_team_elo(starting_elo_file, games_filename):
     team_dictionary = get_elo_team_dictionary()
-    for line in games_file:
-        if len(line) == 0 or line.startswith('#'):#skip commented lines
-            continue
-        ls = line.split(',');
-        #parse line
-        this_team = ls[0]
-        that_team = ls[1]
-        winner = ls[2]
-        match_type = ls[3]
-        if winner == this_team:
-            this_win = True;
-        elif winner == that_team:
-            this_win = False;
-        else:
-            raise ValueError("winner doesn't match either input team: " + str(ls))
-        try:
-            this_team = team_dictionary[this_team]
-            that_team = team_dictionary[that_team]
-            elo.process_game(this_team, that_team, this_win, match_type);
-        except KeyError:
-            print(this_team, 'not found');
-            pass;
-    games_file.close()
+    if starting_elo_file != None:
+        elo_file = open(starting_elo_file, 'r')
+        for line in elo_file:
+            ls = line.split(',');
+            team_dictionary[ls[0]].elo = int(ls[1]);
+        elo_file.close();
+    if games_filename != None:
+        games_file = open(games_filename, 'r')
+        for line in games_file:
+            if len(line) == 0 or line.startswith('#'):#skip commented lines
+                continue
+            ls = line.split(',');
+            #parse line
+            this_team = ls[0]
+            that_team = ls[1]
+            winner = ls[2]
+            match_type = ls[3]
+            if winner == this_team:
+                this_win = True;
+            elif winner == that_team:
+                this_win = False;
+            else:
+                raise ValueError("winner doesn't match either input team: " + str(ls))
+            try:
+                this_team = team_dictionary[this_team]
+                that_team = team_dictionary[that_team]
+                elo.process_game(this_team, that_team, this_win, match_type);
+            except KeyError:
+                print(this_team, 'not found');
+                pass;
+        games_file.close()
     #for i in team_dictionary:
-     #   print(i, team_dictionary[i].elo);
+    #   print(i, team_dictionary[i].elo);
     return team_dictionary
 
 def elo_odds(team1, team2):
@@ -119,10 +135,10 @@ def get_prediction(team_file, elo_scores):
         #This is why decided games have percentages 0 and 1
         if i['win%'] == 1:
             teams[i['team1']].add_win(teams[i['team2']],i['team2wins'])
-            teams[i['team2']].add_loss(teams[i['team1']])
+            teams[i['team2']].add_loss(teams[i['team1']],i['team2wins'])
         elif i['win%'] == 0:
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
-            teams[i['team1']].add_loss(teams[i['team2']])
+            teams[i['team1']].add_loss(teams[i['team2']],i['team1wins'])
         else: #Simulate
             team1_wins = 0
             team2_wins = 0
@@ -134,46 +150,57 @@ def get_prediction(team_file, elo_scores):
                     team2_wins += 1
             if team1_wins == 3:
                 teams[i['team1']].add_win(teams[i['team2']],team2_wins) #not ideal. Look for long term better solution
-                teams[i['team2']].add_loss(teams[i['team1']])
+                teams[i['team2']].add_loss(teams[i['team1']],team2_wins)
             else:
                 teams[i['team2']].add_win(teams[i['team1']],team1_wins) #not ideal. Look for long term better solution
-                teams[i['team1']].add_loss(teams[i['team2']])
+                teams[i['team1']].add_loss(teams[i['team2']],team1_wins)
             
     return teams;
+
+def get_top_1(teams_by_wins):
+    teams_by_wins = sorted(teams_by_wins, key=lambda x: x.wins, reverse=True);
+    if (len(teams_by_wins) == 1):
+        return [teams_by_wins[0]];
+    elif (teams_by_wins[0].wins > teams_by_wins[1].wins):
+        return [teams_by_wins[0]];
+    else: #get tied teams
+        tied_teams = [];
+        target_wins = teams_by_wins[0].wins
+        for i in teams_by_wins:
+            if i.wins == target_wins:
+                tied_teams.append(i);
+        ans = head_to_head_tiebreaker(tied_teams);
+        return ans;
 
 def get_top_n(prediction,n): #this function will be renamed to get_top_n and will take in an n arugment.
     #this is so I can focus on crucible in stage 6.
     #n = 0 crashes this. Not going to fix that.
-    '''Prediction is a team dictionary'''
-    teams_by_wins = []
-    out = []
+    teams_by_wins = [];
+    out = [];
     for i in prediction:
         teams_by_wins.append(prediction[i])
-    #get sorted list of teams
-    teams_by_wins = sorted(teams_by_wins, key=lambda x: x.wins, reverse=True);
-    if teams_by_wins[n-1].wins > teams_by_wins[n].wins:
-        lst = teams_by_wins[0:n]
-        for i in lst:
-            out.append(i.name);
-        return out
-    else:#tiebreaker
-        # this approach is incredibly fucking kludgy, and likely should be rewritten
-        # specifically in phase 2, when we are talking about crucible, so top 6 (to isolate bottom 2)
-        # instead of top 3. I should rewrite this using a loop. No clue why I thought writing it this way was
-        # a good idea
-        i = n
-        while (i>0):
-            if teams_by_wins[i-1].wins > teams_by_wins[i].wins:
-                lst = teams_by_wins[0:i]
-                for j in lst:
-                    out.append(j.name);
-                for j in get_tie_breaker_teams(teams_by_wins,i,n):
-                    out.append(j.name);
-                return out;
-            i -= 1
-        for i in get_tie_breaker_teams(teams_by_wins,0,n):
-            out.append(i.name);
-        return out;
+
+    while (n > 0) :
+        next_team_up = get_top_1(teams_by_wins);
+        if (next_team_up == None):
+            return out;
+        random.shuffle(next_team_up);
+        for k in next_team_up:
+            out.append(k);
+            n = n - 1;
+            found = False;
+            toRemove = None;
+            for i in teams_by_wins:
+                if i.name == k.name:
+                    toRemove = i;
+                    found = True;
+            if not found:
+                print(next_team_up.name + " not found")
+            else:
+                teams_by_wins.remove(toRemove);
+
+    return out;
+
             
 def get_tie_breaker_teams(teams_by_wins, num_teams_above_tie,max_allowed):
     '''assume team by wins sorted as precondition. Get list of teams in tiebreaker'''
@@ -185,61 +212,90 @@ def get_tie_breaker_teams(teams_by_wins, num_teams_above_tie,max_allowed):
             tied_teams.add(i);
     return head_to_head_tiebreaker(tied_teams, max_allowed - num_teams_above_tie)
 
-def head_to_head_tiebreaker(tied_teams, max_teams_allowed):
+def head_to_head_tiebreaker(tied_teams):
     #print(tied_teams, max_teams_allowed)
     #Take in a list of teams, find how they did against each other, striate them based
     #on this internal head-to-head, and advance those with the best record.
 
     #tied_teams - set of teams in the tie
-    tied_wins = {}
+    max_teams_allowed = 1;
+    tied_losses = {}
 
     #get head-to-head results
     for i in tied_teams:
-        tied_wins[i] = 0
+        tied_losses[i] = 0
         for j in tied_teams:
-            tied_wins[i] += i.beat.count(j)
-    teams_by_wins = []
+            tied_losses[i] += i.lost.count(j)
+    teams_by_losses = []
 
     #create list for each # of wins possible that is empty
     for i in range(0,15):#max 14 wins per phase
-        teams_by_wins.append([]);
+        teams_by_losses.append([]);
 
-    #append each team to the number of wins they have
-    for i in tied_wins:
-        teams_by_wins[tied_wins[i]].append(i)
-    teams_by_wins.reverse()
-    #output list
-    out = []
-    for i in teams_by_wins:
-        if len(i) > 0 and len(i) <= max_teams_allowed:
-            max_teams_allowed -= len(i)
-            for j in i:
-                out.append(j)
-                #tied_teams.remove(j) #this apparently doesn't work for....reasons?
-                for k in tied_teams:
-                    if k.name == j.name:
-                        tied_teams.remove(k);
-                        break;
-            #TODO - recall head to head with teams in out removed. **needed bug fix**
-            #if no more spots left, break, this prevents side effects
-            if max_teams_allowed == 0:
-                return out;
-            return out + head_to_head_tiebreaker(tied_teams, max_teams_allowed);
-        #If further tiebreaking is needed
-        elif len(i) > 0 and len(i) > max_teams_allowed:
-            further = get_further_tiebreaker(i,max_teams_allowed)
-            return out + further;
+    #append each team to the number of losses they have
+    for i in tied_losses:
+        teams_by_losses[tied_losses[i]].append(i)
+
+    if len(tied_teams) == 2:
+        if len(teams_by_losses[0]) == 1:
+            return [teams_by_losses[0][0]];
+        else:
+            return get_further_tiebreaker(tied_teams);
+
+    elif len(tied_teams) == 3:
+        if len(teams_by_losses[0]) == 1:
+            return [teams_by_losses[0][0]];
+        else :
+            return get_further_tiebreaker(tied_teams);
+    else:
+        if len(teams_by_losses[0]) == 1:
+            return [teams_by_losses[0][0]];
+        else :
+            for i in teams_by_losses:
+                if len(i) == 0:
+                    continue;
+                elif len(i) == 1:
+                    return [i[0]];
+                else: #cannot resolve head-to-head
+                    break;
+            return get_further_tiebreaker(tied_teams);
     
-def get_further_tiebreaker(teams_list,max_teams_allowed):
+def get_further_tiebreaker(teams_list):
+    max_teams_allowed = 1;
     #sort by win_margin_count in reverse order
     #This is, in effect, a radix sort
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[2], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[1], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
+    teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
+    teams_list = sorted(teams_list, key=lambda x: x.map_wins - x.map_losses, reverse=True)
     ##Sudden Death check
     ##Returns 1 less team as a kludgy as fuck way of signalling this will result in sudden death
     ##Since the two teams are not distinguishable by any tiebreaker metric
-    if teams_list[max_teams_allowed-1].win_margin_count == teams_list[max_teams_allowed].win_margin_count:
+    team1_win_diff = teams_list[max_teams_allowed-1].map_wins - teams_list[max_teams_allowed-1].map_losses;
+    team2_win_diff = teams_list[max_teams_allowed].map_wins - teams_list[max_teams_allowed].map_losses;
+    if team1_win_diff == team2_win_diff and teams_list[max_teams_allowed-1].win_margin_count == teams_list[max_teams_allowed].win_margin_count:
+        if PRINT_SUDDEN_DEATHS:
+            sudden_death_size = 0;
+            sd_teams = [];
+            abbr_set = [];
+            for i in teams_list :
+                if team1_win_diff == i.map_wins - i.map_losses and teams_list[max_teams_allowed-1].win_margin_count == i.win_margin_count:
+                    sudden_death_size += 1;
+                    sd_teams.append(i);
+                    abbr_set.append(i.name);
+            abbr_set = sorted(abbr_set);
+            abbrString = "";
+            for i in abbr_set:
+                abbrString += i+ ",";
+            if abbrString not in sudden_deaths:
+                print(teams_list);
+                sudden_deaths[abbrString] = 1;
+            else:
+                sudden_deaths[abbrString] += 1;
+            return sd_teams;
+            
+                
         return teams_list[:max_teams_allowed-1];
     else: #Tie is broken
         return teams_list[:max_teams_allowed];
@@ -248,7 +304,7 @@ def get_team_dictionary(team_file_list, elo_scores):
     team_names = set()
     teams={}
     #Set up Team set
-    for i in team_file_list[:6]:#assumes all 8 teams appear in first 4 games. This number can be increased
+    for i in team_file_list[:12]:#assumes all 8 teams appear in first 12 games. This number can be increased
                            #to accomodate more games without negative side effects
         team_names.add(i['team1'])
         team_names.add(i['team2'])
@@ -277,7 +333,7 @@ def get_binomial_win_percentage_two_wins(p,n):
     return None
 
 def get_week_bo3(*team_names):
-    elo_scores = get_team_elo(GAMES_FILE)
+    elo_scores = get_team_elo(STARTING_ELO_FILE,GAMES_FILE)
     print('Team 1 | 2-0 | 2-1 | 1-2 | 0-2 | Team 2')
     print('----|---|---|---|---|---|---|----')
     for i in range (0, int(len(team_names)/2)):
@@ -295,7 +351,7 @@ def get_week_bo3(*team_names):
               round(100*team2_win,2),'% -',ALL_TEAMS_DICT[team_names[2*i+1]])
 
 def get_week(*team_names):
-    elo_scores = get_team_elo(GAMES_FILE)
+    elo_scores = get_team_elo(STARTING_ELO_FILE,GAMES_FILE)
     print('Team 1 | 3-0 | 3-1 | 3-2 | 2-3 | 1-3 | 0-3 | Team 2')
     print('----|---|---|---|---|---|---|----')
     for i in range (0, int(len(team_names)/2)):
@@ -318,15 +374,15 @@ def get_week(*team_names):
 
 
 def this_week():
-    get_week("NT","BS","TF","TS","SS","T8","NV","GF","NV","TS","NT","SS");
-    get_week("PD","TR","SN","DG","BG","TX","TL","FN","TL","DG","PD","BG");
-    get_week("RV","L5","TB","MB","MM","TP","GG","MI","RV","TB","GG","MM");
+    get_week("NT","R2","GF","SS","NV","ED","TF","TS");
+    get_week("TR","DG","TL","TX","GG","ZE","PD","FN");
+    get_week("MI","L5","TP","RR","MB","RV","TB","MM");
 
 def main():
     team_file_list = read_team_file(INPUT_FILE)
     elo_scores = {}
     if CALCULATE_ELO:
-        elo_scores = get_team_elo(GAMES_FILE)
+        elo_scores = get_team_elo(STARTING_ELO_FILE, GAMES_FILE)
     else:
         elo_scores = get_elo_team_dictionary()
     if JUST_GET_ELO:
@@ -361,7 +417,7 @@ def main():
         if len(i) < GET_TOP_N: #assumes top 3. Need to make general
             sudden_death_count += 1
         for j in i: #count number of times each team in D appears in top results
-            d[j] += 1;
+            d[j.name] += 1;
     print("Sudden Death chance", round(100*(sudden_death_count/SIMULATIONS),5),"%")
     for i in d: #turn them into percentages rather than raw counts
         #with 1 decimal place '.2%f' is fo suckas
@@ -377,6 +433,8 @@ def main():
     for i in dlist:
         print(rank, '\t', ALL_TEAMS_DICT[i[0]], '\t', i[1],'%')
         rank += 1
+    for i in sudden_deaths:
+        print(i + " - " + str(round((sudden_deaths[i])/SIMULATIONS,5)*100) + "%");
     
 
 if __name__=="__main__":
