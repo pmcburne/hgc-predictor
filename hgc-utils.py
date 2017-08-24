@@ -4,34 +4,34 @@ import elo
 
 #Global fields
 SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/euClash.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 3;
-REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
+GET_TOP_N = 6;
+REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
 JUST_GET_ELO = False;
 
 
 PRINT_SUDDEN_DEATHS = True;
 
-ALL_TEAMS = ['R2','GF','TS','NV','ED','SS','NT','TF',
+ALL_TEAMS = ['R2','GF','TS','LF','ED','SS','SG','TF',
              'TL','FN','DG','PD','TR','TX','ZE','GG',
              'MB','L5','TP','MI','MM','RR','TB','RV',
-             'ES','SP','WK','CE','SO','HL','RP','KT',
+             'ES','SP','WK','CE','SO','HL','RP','KT','TO','BG',
              'OC','TW','LA','SE'];
 
 
-ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','NV':'Team Naventic',
-                  'ED':'Even in Death-NEW','SS':'Superstars','NT':'No Tomorrow','TF':'Team Freedom',
-
+ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','LF':'Lag Force',
+                  'ED':'Even in Death-NEW','SS':'Superstars','SG':'SpaceStation Gaming','TF':'Team Freedom',
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
-                  'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys-NEW','ZE':'Zealots-NEW',
+                  'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys','ZE':'Zealots',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
-                  'MM':'MVP Miracle','RR':'Rrr-NEW','TB':'Team Blossom','RV':'Raven',
-                  'ES':'E-star','SP':'SuperPerfectTeam', 'KT':'Kudos Top-NEW',
-                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','WK':"W.K. Gaming-NEW",
+                  'MM':'MVP Miracle','RR':'Rrr','TB':'Team BlossoM','RV':'Raven',
+                  'ES':'E-star-DISBANDED','SP':'Super Perfect Team', 'KT':'Kudos Top',
+                  'TO':"The One - NEW", 'BG':"Beyond the Game - NEW",
+                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','WK':"W.K. Gaming-RELEGATED",
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
 sudden_deaths = {};
