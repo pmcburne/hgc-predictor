@@ -11,7 +11,7 @@ PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
 GET_TOP_N = 6;
 REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = False;
+JUST_GET_ELO = True;
 
 
 PRINT_SUDDEN_DEATHS = True;
@@ -24,7 +24,7 @@ ALL_TEAMS = ['R2','GF','TS','LF','ED','SS','SG','TF',
 
 
 ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','LF':'Lag Force',
-                  'ED':'Even in Death-NEW','SS':'Superstars','SG':'SpaceStation Gaming','TF':'Team Freedom',
+                  'ED':'Even in Death-NEW','SS':'Superstars','SG':'Spacestation Gaming','TF':'Team Freedom',
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
                   'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys','ZE':'Zealots',
                   'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
