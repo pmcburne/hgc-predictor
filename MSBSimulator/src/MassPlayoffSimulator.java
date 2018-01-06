@@ -1,7 +1,7 @@
 import java.util.Map;
 
 public class MassPlayoffSimulator {
-	final int SIM_COUNT = 100000;
+	final int SIM_COUNT = 10000;
 	final int NUM_MATCHES = 10;
 	
 	String teamFileName, playoffFileName;
@@ -36,7 +36,7 @@ public class MassPlayoffSimulator {
 		MassPlayoffSimulator mps = new MassPlayoffSimulator("data/teams.csv", "data/playoff.csv");
 		PlayoffMatchSummary[] pms = mps.simulate();
 		for(int i = 0; i < pms.length; i++) {
-			System.out.println("=============MATCH " + i + "===============");
+			System.out.println("=============MATCH " + (i + 1) + "===============");
 			System.out.println(pms[i]);
 		}
 	}

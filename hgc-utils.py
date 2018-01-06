@@ -4,34 +4,35 @@ import elo
 
 #Global fields
 SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/kr.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
-STARTING_ELO_FILE = 'data/elo.csv'
+STARTING_ELO_FILE = 'data/elo-p1-18.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 6;
-REVERSE_PERCENTAGES = True; #Used for Crucible in phase 2
+GET_TOP_N = 5;
+REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
 JUST_GET_ELO = True;
 
 
 PRINT_SUDDEN_DEATHS = True;
 
-ALL_TEAMS = ['R2','GF','TS','LF','ED','SS','SG','TF',
-             'TL','FN','DG','PD','TR','TX','ZE','GG',
-             'MB','L5','TP','MI','MM','RR','TB','RV',
-             'ES','SP','WK','CE','SO','HL','RP','KT','TO','BG',
+ALL_TEAMS = ['R2','GF','TS','HH','LF','OG','SG','TF',
+             'TL','FN','DG','DS','TR','EX','ZL','LO',
+             'KB','L5','TP','FZ','MR','GL','TB','TA',
+             'SP','CE','SO','HL','RP','KT','TO','BG',
              'OC','TW','LA','SE'];
 
+REGIONS = ['OC','TW','LA','SE'];
 
-ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','LF':'Lag Force',
-                  'ED':'Even in Death-NEW','SS':'Superstars','SG':'Spacestation Gaming','TF':'Team Freedom',
-                  'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','PD':'Playing Ducks',
-                  'TR':'Tricked Esports','TX':'Team Expert','GG':'Team Good Guys','ZE':'Zealots',
-                  'MB':'MVP Black','L5':'L-5','TP':'Tempest','MI':'Mighty',
-                  'MM':'MVP Miracle','RR':'Rrr','TB':'Team BlossoM','RV':'Raven',
-                  'ES':'E-star-DISBANDED','SP':'Super Perfect Team', 'KT':'Kudos Top',
-                  'TO':"The One - NEW", 'BG':"Beyond the Game - NEW",
-                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG','WK':"W.K. Gaming-RELEGATED",
+ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','HH':'Heroes Hearth - NEW',
+                  'LF':'LFM Esports - NEW','OG':'Old Gods','SG':'Spacestation Gaming','TF':'Team Freedom',
+                  'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','DS':'Diamond Skin',
+                  'TR':'Tricked Esports','EX':'Team Expert','LO':'Leftovers - NEW','ZL':'Zealots',
+                  'KB':'KSV Black','L5':'L-5','TP':'Tempest','FZ':'Team Feliz - NEW',
+                  'MR':'Miracle','GL':'Good Luck - NEW','TB':'Team BlossoM','TA':'Team Ace - NEW',
+                  'SP':'Super Perfect Team', 'KT':'Kudos Top',
+                  'TO':"The One", 'BG':"Beyond the Game",
+                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG',
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
 sudden_deaths = {};
@@ -392,8 +393,8 @@ def main():
         teams_and_elos = sorted(teams_and_elos, key=lambda x: x[1], reverse=True);
         rank = 1
         for i in teams_and_elos:
-            if "RETIRED" in ALL_TEAMS_DICT[i[0]]:
-                pass
+            if i[0] in REGIONS:
+                print('\t', ALL_TEAMS_DICT[i[0]],'\t',i[1])
             else:
                 print(rank, '\t', ALL_TEAMS_DICT[i[0]],'\t',i[1])
                 rank += 1;

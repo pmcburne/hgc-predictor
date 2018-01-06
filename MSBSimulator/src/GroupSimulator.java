@@ -18,12 +18,14 @@ public class GroupSimulator {
 	}
 	
 	public void simulate() {
+		//MatchSimulator simulator = new FiftyFiftySimulator();
 		MatchSimulator simulator = new BestOfTwoSimulator();
 		for (Match m : matches) {
 			simulator.simulateMatch(m.home, m.away);
 		}
 		
-		//prune out non-participants
+		/**
+		 * //prune out non-participants
 		List<String> toRemove = new LinkedList<String>();
 		
 		//for (String teamName : teams.keySet()) {
@@ -73,12 +75,12 @@ public class GroupSimulator {
 	
 	public List<Team> getTopTwo() {
 		List<Team> sortedTeams = getTeamsSortedByPoints();
-		return sortedTeams.subList(0, 2);
+		return sortedTeams.subList(0, 4);
 	}
 	
 	public List<Team> getNextTwo() {
 		List<Team> sortedTeams = getTeamsSortedByPoints();
-		return sortedTeams.subList(2, 4);
+		return sortedTeams.subList(4, 8);
 	}
 	
 	public static void main(String[] args) {

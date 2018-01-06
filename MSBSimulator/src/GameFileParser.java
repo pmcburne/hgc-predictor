@@ -30,7 +30,7 @@ public class GameFileParser {
 					throw new IllegalStateException("ERROR: Team abbrv " + ls[0] + " not found in teams.");
 				}
 				if (!teams.containsKey(ls[1])) {
-					throw new IllegalStateException("ERROR: Team abbrv " + ls[0] + " not found in teams.");
+					throw new IllegalStateException("ERROR: Team abbrv " + ls[1] + " not found in teams.");
 				}
 				
 				Match t = new Match(teams.get(ls[0]), teams.get(ls[1]));

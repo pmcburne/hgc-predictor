@@ -15,7 +15,7 @@ public class BestOfTwoSimulator extends MatchSimulator {
 		
 		if (homeWins == 2&& awayWins == 0) {
 			home.teamsBeat.add(away);
-			home.points += 3;
+			home.points += 2;
 			away.teamsLostTo.add(home);
 		} else if (homeWins == 1 && awayWins == 1) {
 			home.teamsDrawn.add(away);
@@ -25,7 +25,7 @@ public class BestOfTwoSimulator extends MatchSimulator {
 		} else if (homeWins == 0 && awayWins == 2) {
 			home.teamsLostTo.add(away);
 			away.teamsBeat.add(home);
-			away.points += 3;
+			away.points += 2;
 		}
 	}
 }
