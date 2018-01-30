@@ -3,36 +3,36 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
+SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
+INPUT_FILE = 'data/krClash.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
-STARTING_ELO_FILE = 'data/elo-p1-18.csv'
+STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 5;
+GET_TOP_N = 4;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = True;
+JUST_GET_ELO = False;
 
 
 PRINT_SUDDEN_DEATHS = True;
 
-ALL_TEAMS = ['R2','GF','TS','HH','LF','OG','SG','TF',
-             'TL','FN','DG','DS','TR','EX','ZL','LO',
-             'KB','L5','TP','FZ','MR','GL','TB','TA',
-             'SP','CE','SO','HL','RP','KT','TO','BG',
+ALL_TEAMS = ['TT','GF','TS','HH','LF','SI','SG','TF',
+             'TL','FN','DG','DS','TR','ME','ZE','LO',
+             'KB','BX','TP','FZ','MR','GL','TB','TA',
+             'SP','CE','SO','TI','RP','SL','TO','BG',
              'OC','TW','LA','SE'];
 
 REGIONS = ['OC','TW','LA','SE'];
 
-ALL_TEAMS_DICT = {'R2':'Roll20 Esports','GF':'Gale Force Esports','TS':'Tempo Storm','HH':'Heroes Hearth - NEW',
-                  'LF':'LFM Esports - NEW','OG':'Old Gods','SG':'Spacestation Gaming','TF':'Team Freedom',
+ALL_TEAMS_DICT = {'TT':'Team Twelve','GF':'Gale Force Esports','TS':'Tempo Storm','HH':'Heroes Hearth - NEW',
+                  'LF':'LFM Esports - NEW','SI':'Simplicity','SG':'Spacestation Gaming','TF':'Team Freedom',
                   'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','DS':'Diamond Skin',
-                  'TR':'Tricked Esports','EX':'Team Expert','LO':'Leftovers - NEW','ZL':'Zealots',
-                  'KB':'KSV Black','L5':'L-5','TP':'Tempest','FZ':'Team Feliz - NEW',
+                  'TR':'Tricked Esports','ME':'Method','LO':'Leftovers - NEW','ZE':'Zealots',
+                  'KB':'KSV Black','BX':'Ballistix Gaming','TP':'Tempest','FZ':'Team Feliz - NEW',
                   'MR':'Miracle','GL':'Good Luck - NEW','TB':'Team BlossoM','TA':'Team Ace - NEW',
-                  'SP':'Super Perfect Team', 'KT':'Kudos Top',
+                  'SP':'Super Perfect Team', 'SL':'Sunny Lion - NEW',
                   'TO':"The One", 'BG':"Beyond the Game",
-                  'CE':'ce', 'SO': 'Start Over Again','HL':'Hots Lady','RP':'RPG',
+                  'CE':'ce', 'SO': 'Start Over Again','TI':'TimeFlow - NEW','RP':'RPG',
                   'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
 
 sudden_deaths = {};
