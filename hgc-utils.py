@@ -4,7 +4,7 @@ import elo
 
 #Global fields
 SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/krClash.csv' #data source for match records - this may be deprecated in the future
+INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
