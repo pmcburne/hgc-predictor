@@ -3,7 +3,7 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
+SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
