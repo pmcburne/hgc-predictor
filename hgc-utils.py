@@ -3,7 +3,7 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 100000      #Number of simulations - 10^5 minimum recommended
+SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
 INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
@@ -170,8 +170,20 @@ def get_top_1(teams_by_wins):
         for i in teams_by_wins:
             if i.wins == target_wins:
                 tied_teams.append(i);
-        ans = head_to_head_tiebreaker(tied_teams);
+        ans = game_score_tiebreaker(tied_teams);
         return ans;
+
+def game_score_tiebreaker(tied_teams):
+    tied_teams = sorted(tied_teams, key=lambda x: x.map_wins - x.map_losses, reverse=True)
+    target_score = tied_teams[0].map_wins - tied_teams[0].map_losses;
+    if target_score != tied_teams[1].map_wins - tied_teams[1].map_losses:
+        return [tied_teams[0]];
+    else:
+        game_score_tied = [];
+        for i in range(0,len(tied_teams)):
+            if target_score == tied_teams[i].map_wins - tied_teams[i].map_losses:
+                game_score_tied.append(tied_teams[i]);
+        return head_to_head_tiebreaker(game_score_tied);
 
 def get_top_n(prediction,n): #this function will be renamed to get_top_n and will take in an n arugment.
     #this is so I can focus on crucible in stage 6.
@@ -268,8 +280,7 @@ def get_further_tiebreaker(teams_list):
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[2], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[1], reverse=True)
     teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
-    teams_list = sorted(teams_list, key=lambda x: x.win_margin_count[0], reverse=True)
-    teams_list = sorted(teams_list, key=lambda x: x.map_wins - x.map_losses, reverse=True)
+    #teams_list = sorted(teams_list, key=lambda x: x.map_wins - x.map_losses, reverse=True)
     ##Sudden Death check
     ##Returns 1 less team as a kludgy as fuck way of signalling this will result in sudden death
     ##Since the two teams are not distinguishable by any tiebreaker metric
