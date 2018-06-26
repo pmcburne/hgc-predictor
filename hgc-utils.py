@@ -17,7 +17,7 @@ firstTimeSimulating = True;
 
 PRINT_SUDDEN_DEATHS = False;
 
-ALL_TEAMS = ['OT','EN','TS','HH','LF','SI','NT','TF',
+ALL_TEAMS = ['OC','EN','TS','HH','LF','SI','NT','TF',
              'TL','FN','DG','GR','MM','ME','ZE','LO',
              'GG','BX','TP','FZ','MI','GL','TB','SN',
              'SP','CE','SO','TI','RP','SL','TO','BG','KT',
