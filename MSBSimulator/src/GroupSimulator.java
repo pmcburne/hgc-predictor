@@ -24,29 +24,28 @@ public class GroupSimulator {
 			simulator.simulateMatch(m.home, m.away);
 		}
 		
-		/**
-		 * //prune out non-participants
+		//prune out non-participants
 		List<String> toRemove = new LinkedList<String>();
 		
-		//for (String teamName : teams.keySet()) {
+		for (String teamName : teams.keySet()) {
 			
 			//horrible coupled bullshit
 			if (gameFileName.contains("group2")){
-				teams.remove("TS");
-				teams.remove("DG");
-				teams.remove("ES");
-				teams.remove("L5");
-				teams.remove("LA");
-				teams.remove("TW");
+				toRemove.add("TS");
+				toRemove.add("GG");
+				toRemove.add("BX");
+				toRemove.add("MF");
+				toRemove.add("TO");
+				toRemove.add("FN");
 			}
 			
 			else {
-				teams.remove("R2");
-				teams.remove("OC");
-				teams.remove("MB");
-				teams.remove("FN");
-				teams.remove("SE");
-				teams.remove("SP");
+				toRemove.add("ME");
+				toRemove.add("LM");
+				toRemove.add("TP");
+				toRemove.add("DG");
+				toRemove.add("HH");
+				toRemove.add("CE");
 			}
 			
 			
@@ -54,11 +53,11 @@ public class GroupSimulator {
 			/**if (t.teamsBeat.isEmpty() && t.teamsDrawn.isEmpty() && t.teamsLostTo.isEmpty()) {
 				toRemove.add(teamName);
 			}*/
-		//}
+		}
 		
-		//for (String s : toRemove) {
-		//	teams.remove(s);
-		//}
+		for (String s : toRemove) {
+			teams.remove(s);
+		}
 	}
 	
 	public List<Team> getTeamsSortedByPoints() {
@@ -75,16 +74,16 @@ public class GroupSimulator {
 	
 	public List<Team> getTopTwo() {
 		List<Team> sortedTeams = getTeamsSortedByPoints();
-		return sortedTeams.subList(0, 4);
+		return sortedTeams.subList(0, 2);
 	}
 	
 	public List<Team> getNextTwo() {
 		List<Team> sortedTeams = getTeamsSortedByPoints();
-		return sortedTeams.subList(4, 8);
+		return sortedTeams.subList(2, 4);
 	}
 	
 	public static void main(String[] args) {
-		GroupSimulator gs = new GroupSimulator("data/teams.csv", "data/group1.csv");
+		GroupSimulator gs = new GroupSimulator("data/teams.csv", "data/group2.csv");
 		gs.simulate();
 		List<Team> teams = gs.getTeamsSortedByPoints();
 		for (Team t : teams) {

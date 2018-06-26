@@ -50,14 +50,14 @@ public class MassGroupSimulator {
 				}
 			}
 
-			/**for (Team t : gs.getLastTwo()) {
+			for (Team t : gs.getLastTwo()) {
 				try {
 					int prevCount = eliminatedCounts.get(t.abbrv);
 					eliminatedCounts.put(t.abbrv, prevCount + 1);
 				} catch (NullPointerException e) {
 					eliminatedCounts.put(t.abbrv, 1);
 				}
-			}*/
+			}
 		}
 	}
 	
@@ -74,14 +74,19 @@ public class MassGroupSimulator {
 		for (String s : losersBracketCounts.keySet()) {
 			System.out.printf((s + " - %.1f\n"), losersBracketCounts.get(s)/1000.0);
 		}
-		/**System.out.println("\n===== Eliminated ==========");
+		System.out.println("\n===== Eliminated ==========");
 		for (String s : eliminatedCounts.keySet()) {
 			System.out.printf((s + " - %.1f\n"), eliminatedCounts.get(s)/1000.0);
-		}*/
+		}
 	}
 
 	public static void main(String[] args) {
 		MassGroupSimulator mgs = new MassGroupSimulator("data/teams.csv", "data/group1.csv");
+		mgs.simulate();
+
+		mgs.printResults();
+		
+		mgs = new MassGroupSimulator("data/teams.csv", "data/group2.csv");
 		mgs.simulate();
 
 		mgs.printResults();

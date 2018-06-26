@@ -3,37 +3,38 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 10000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/naClash.csv' #data source for match records - this may be deprecated in the future
+SIMULATIONS = 1000      #Number of simulations - 10^5 minimum recommended
+INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 4;
+GET_TOP_N = 3;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = False;
+JUST_GET_ELO = True;
 
+firstTimeSimulating = True;
 
-PRINT_SUDDEN_DEATHS = True;
+PRINT_SUDDEN_DEATHS = False;
 
-ALL_TEAMS = ['TT','GF','TS','HH','LF','SI','SG','TF',
-             'TL','FN','DG','DS','TR','ME','ZE','LO',
-             'KB','BX','TP','FZ','MR','GL','TB','TA',
-             'SP','CE','SO','TI','RP','SL','TO','BG',
-             'OC','TW','LA','SE'];
+ALL_TEAMS = ['OT','EN','TS','HH','LF','SI','NT','TF',
+             'TL','FN','DG','GR','MM','ME','ZE','LO',
+             'GG','BX','TP','FZ','MI','GL','TB','SN',
+             'SP','CE','SO','TI','RP','SL','TO','BG','KT',
+             'ANZ','TWN','LAT','SEA'];
 
 REGIONS = ['OC','TW','LA','SE'];
 
-ALL_TEAMS_DICT = {'TT':'Team Twelve','GF':'Gale Force Esports','TS':'Tempo Storm','HH':'Heroes Hearth - NEW',
-                  'LF':'LFM Esports - NEW','SI':'Simplicity','SG':'Spacestation Gaming','TF':'Team Freedom',
-                  'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','DS':'Diamond Skin',
-                  'TR':'Tricked Esports','ME':'Method','LO':'Leftovers - NEW','ZE':'Zealots',
-                  'KB':'KSV Black','BX':'Ballistix Gaming','TP':'Tempest','FZ':'Team Feliz - NEW',
-                  'MR':'Miracle','GL':'Good Luck - NEW','TB':'Team BlossoM','TA':'Team Ace - NEW',
+ALL_TEAMS_DICT = {'OC':'Team Octalysis','EN':'Endemic Esports','TS':'Tempo Storm','HH':'Heroes Hearth',
+                  'LF':'LFM Esports','SI':'Simplicity','NT':'No Tomorrow','TF':'Team Freedom',
+                  'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','GR':'Granit Gaming',
+                  'MM':'Monkey Menagerie','ME':'Method','LO':'Leftovers','ZE':'Zealots',
+                  'GG':'Gen.G Esports','BX':'Ballistix Gaming','TP':'Tempest','FZ':'Team Feliz',
+                  'MI':'Miracle','GL':'Good Luck','TB':'Team BlossoM','SN':'Supernova - NEW',
                   'SP':'Super Perfect Team', 'SL':'Sunny Lion - NEW',
-                  'TO':"The One", 'BG':"Beyond the Game",
+                  'TO':"The One", 'BG':"Beyond the Game",'KT':"Kudos Top",
                   'CE':'ce', 'SO': 'Start Over Again','TI':'TimeFlow - NEW','RP':'RPG',
-                  'OC':'Oceania','TW':'Taiwan','LA':'Latin America','SE':'Southeast Asia'};
+                  'ANZ':'Australia/New Zealand','TWN':'Taiwan','LAT':'Latin America','SEA':'Southeast Asia'};
 
 sudden_deaths = {};
 sudden_death_size = 0;
@@ -79,7 +80,6 @@ def get_current_state(team_filename): #pretty sure this is depricated
         elif i['win%'] == 0:
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
             teams[i['team1']].add_loss(teams[i['team2']],i['team1wins'])
-            
     return teams;
 
 def get_elo_team_dictionary():
@@ -129,6 +129,7 @@ def elo_odds(team1, team2):
     return elo.get_expected(team1.elo, team2.elo);
 
 def get_prediction(team_file, elo_scores):
+    global firstTimeSimulating;
     teams = get_team_dictionary(team_file, elo_scores)
     '''generates a random simulation from a team file, while not changing decided games'''
     for i in team_file:
@@ -141,6 +142,16 @@ def get_prediction(team_file, elo_scores):
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
             teams[i['team1']].add_loss(teams[i['team2']],i['team1wins'])
         else: #Simulate
+            if firstTimeSimulating:
+                firstTimeSimulating = False;
+                for t in teams:
+                    tm = teams[t];
+                    s = tm.name + " " + str(tm.wins) + "-" + str(tm.losses) + '\n';
+                    s += '\tWins against: ' + tm.get_beat_name_list() + '\n'
+                    s += '\tLost against: ' + tm.get_lost_name_list() + '\n'
+                    s += '\tWin Margins: ' + str(tm.win_margin_count) + '\n'
+                    s += '\tMap Score: ' + str(tm.map_wins) + '-' + str(tm.map_losses) + '\n'
+                    print(s);            
             team1_wins = 0
             team2_wins = 0
             odds = elo_odds(teams[i['team1']],teams[i['team2']])
@@ -391,6 +402,7 @@ def this_week():
     get_week("MI","L5","TP","RR","MB","RV","TB","MM");
 
 def main():
+    firstTimeSimulating = True;
     team_file_list = read_team_file(INPUT_FILE)
     elo_scores = {}
     if CALCULATE_ELO:
@@ -411,6 +423,7 @@ def main():
                 rank += 1;
         return
     results = []
+    #print(team_file_list);
     for i in range(0,SIMULATIONS):
         #run simulation
         prediction = get_prediction(team_file_list, elo_scores)
