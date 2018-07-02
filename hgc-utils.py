@@ -3,38 +3,42 @@ import random
 import elo
 
 #Global fields
-SIMULATIONS = 1000      #Number of simulations - 10^5 minimum recommended
-INPUT_FILE = 'data/eu.csv' #data source for match records - this may be deprecated in the future
+SIMULATIONS = 10000     #Number of simulations - 10^5 minimum recommended
+INPUT_FILE = 'data/na.csv' #data source for match records - this may be deprecated in the future
 GAMES_FILE = 'data/games.csv' #games file that records previous games
 STARTING_ELO_FILE = 'data/elo.csv'
 PRINT_OUTCOMES = False; #Debugging - trust me, leave this false.
-GET_TOP_N = 3;
+GET_TOP_N = 2;
 REVERSE_PERCENTAGES = False; #Used for Crucible in phase 2
 CALCULATE_ELO = True;
-JUST_GET_ELO = True;
+JUST_GET_ELO = False;
 
 firstTimeSimulating = True;
+trueSimulationsCount = SIMULATIONS;
 
 PRINT_SUDDEN_DEATHS = False;
 
-ALL_TEAMS = ['OC','EN','TS','HH','LF','SI','NT','TF',
-             'TL','FN','DG','GR','MM','ME','ZE','LO',
-             'GG','BX','TP','FZ','MI','GL','TB','SN',
-             'SP','CE','SO','TI','RP','SL','TO','BG','KT',
-             'ANZ','TWN','LAT','SEA'];
+ALL_TEAMS = ['OCT','END','TS','HHE','LFM','SIM','NT','TF',
+             'TL','FNC','DIG','GRA','MM','MET','ZEA','LO',
+             'GEN','BLX','TP','FLZ','MIR','GL','BLS','SUP',
+             'SPT','CE','NUT','RPG','AT','ONE','BTG','KT',
+             'MF','CRI','XD','REE','P2P','AZT','IH','TV',
+             'TWN','LAT','SEA'];
 
-REGIONS = ['OC','TW','LA','SE'];
+REGIONS = ['TWN','LAT','SEA'];
 
-ALL_TEAMS_DICT = {'OC':'Team Octalysis','EN':'Endemic Esports','TS':'Tempo Storm','HH':'Heroes Hearth',
-                  'LF':'LFM Esports','SI':'Simplicity','NT':'No Tomorrow','TF':'Team Freedom',
-                  'TL':'Team Liquid','FN':'Fnatic','DG':'Team Dignitas','GR':'Granit Gaming',
-                  'MM':'Monkey Menagerie','ME':'Method','LO':'Leftovers','ZE':'Zealots',
-                  'GG':'Gen.G Esports','BX':'Ballistix Gaming','TP':'Tempest','FZ':'Team Feliz',
-                  'MI':'Miracle','GL':'Good Luck','TB':'Team BlossoM','SN':'Supernova - NEW',
-                  'SP':'Super Perfect Team', 'SL':'Sunny Lion - NEW',
-                  'TO':"The One", 'BG':"Beyond the Game",'KT':"Kudos Top",
-                  'CE':'ce', 'SO': 'Start Over Again','TI':'TimeFlow - NEW','RP':'RPG',
-                  'ANZ':'Australia/New Zealand','TWN':'Taiwan','LAT':'Latin America','SEA':'Southeast Asia'};
+ALL_TEAMS_DICT = {'OCT':'Team Octalysis','END':'Endemic Esports','TS':'Tempo Storm','HHE':'Heroes Hearth',
+                  'LFM':'LFM Esports','SIM':'Simplicity','NT':'No Tomorrow','TF':'Team Freedom',
+                  'TL':'Team Liquid','FNC':'Fnatic','DIG':'Team Dignitas','GRA':'Granit Gaming',
+                  'MM':'Monkey Menagerie','MET':'Method','LO':'Leftovers','ZEA':'Zealots',
+                  'GEN':'Gen.G Esports','BLX':'Ballistix Gaming','TP':'Tempest','FLZ':'Team Feliz',
+                  'MIR':'Miracle','GL':'Good Luck','BLS':'Team BlossoM', 'SUP':'Supernova',
+                  'SPT':'Super Perfect Team', 'NUT':'Team Nut - NEW', 
+                  'ONE':"The One", 'BTG':"Beyond the Game",'KT':"Kudos Top",
+                  'CE':'ce', 'AT': 'A-Team - NEW','RPG':'RPG',
+                  'TWN':'Taiwan','LAT':'Latin America','SEA':'Southeast Asia',
+                  'MF':'Mindfreak','CRI':'Crimson Gaming','XD':"Xylophone Dudes",'REE':"REEality",
+                  'P2P':'Pleb2Pro','AZT':'Aztech Entertainment','IH':'Impenetrable Hill','TV':'Twisted Vision'};
 
 sudden_deaths = {};
 sudden_death_size = 0;
@@ -142,18 +146,18 @@ def get_prediction(team_file, elo_scores):
             teams[i['team2']].add_win(teams[i['team1']],i['team1wins'])
             teams[i['team1']].add_loss(teams[i['team2']],i['team1wins'])
         else: #Simulate
-            if firstTimeSimulating:
-                firstTimeSimulating = False;
-                for t in teams:
-                    tm = teams[t];
-                    s = tm.name + " " + str(tm.wins) + "-" + str(tm.losses) + '\n';
-                    s += '\tWins against: ' + tm.get_beat_name_list() + '\n'
-                    s += '\tLost against: ' + tm.get_lost_name_list() + '\n'
-                    s += '\tWin Margins: ' + str(tm.win_margin_count) + '\n'
-                    s += '\tMap Score: ' + str(tm.map_wins) + '-' + str(tm.map_losses) + '\n'
-                    print(s);            
-            team1_wins = 0
-            team2_wins = 0
+            #if firstTimeSimulating:
+            #    firstTimeSimulating = False;
+            #    for t in teams:
+            #        tm = teams[t];
+            #        s = tm.name + " " + str(tm.wins) + "-" + str(tm.losses) + '\n';
+            #        s += '\tWins against: ' + tm.get_beat_name_list() + '\n'
+            #        s += '\tLost against: ' + tm.get_lost_name_list() + '\n'
+            #        s += '\tWin Margins: ' + str(tm.win_margin_count) + '\n'
+            #        s += '\tMap Score: ' + str(tm.map_wins) + '-' + str(tm.map_losses) + '\n'
+            #        print(s);            
+            team1_wins = i['team1wins']
+            team2_wins = i['team2wins']
             odds = elo_odds(teams[i['team1']],teams[i['team2']])
             while team1_wins < 3 and team2_wins < 3:
                 if odds > random.random():
@@ -206,7 +210,9 @@ def get_top_n(prediction,n): #this function will be renamed to get_top_n and wil
 
     while (n > 0) :
         next_team_up = get_top_1(teams_by_wins);
-        if (next_team_up == None):
+        #print(next_team_up)
+        if (len(next_team_up) == 0):
+            print("steve")
             return out;
         random.shuffle(next_team_up);
         for k in next_team_up:
@@ -222,6 +228,8 @@ def get_top_n(prediction,n): #this function will be renamed to get_top_n and wil
                 print(next_team_up.name + " not found")
             else:
                 teams_by_wins.remove(toRemove);
+            if n == 0:
+                break;
 
     return out;
 
@@ -319,7 +327,7 @@ def get_further_tiebreaker(teams_list):
             return sd_teams;
             
                 
-        return teams_list[:max_teams_allowed-1];
+        return teams_list[:max_teams_allowed];
     else: #Tie is broken
         return teams_list[:max_teams_allowed];
                           
@@ -431,6 +439,7 @@ def main():
         results.append(get_top_n(prediction,GET_TOP_N))
         #if len(results[i]) == 2:
             #print(results[i]);
+    print(SIMULATIONS - len(results));
     sudden_death_count = 0;
     d = {}
     #Add teams to dictionary
